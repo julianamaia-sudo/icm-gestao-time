@@ -1,0 +1,2238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão Time · ICM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap');
+
+  :root {
+    --navy: #1a3d5c;
+    --teal: #2cbfad;
+    --teal-light: #e8f8f6;
+    --teal-mid: #a8e8e0;
+    --gold: #f5a623;
+    --gold-light: #fff8ed;
+    --red: #e05252;
+    --red-light: #fdf0f0;
+    --green: #27a86a;
+    --green-light: #edf8f3;
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-2: #64748b;
+    --text-3: #94a3b8;
+    --sidebar-w: 260px;
+    --panel-w: 300px;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    z-index: 100;
+    overflow: hidden;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-logo .brand {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+  .sidebar-logo .sub {
+    font-size: 11px;
+    color: var(--teal);
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .nav-section {
+    padding: 16px 12px 8px;
+  }
+  .nav-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    padding: 0 8px;
+    margin-bottom: 6px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    color: rgba(255,255,255,0.65);
+    cursor: pointer;
+    transition: all .15s;
+    font-size: 13.5px;
+    font-weight: 450;
+    user-select: none;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+  .nav-item.active { background: var(--teal); color: #fff; font-weight: 600; }
+  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.3);
+  }
+  .sync-status { display: flex; align-items: center; gap: 6px; }
+  .sync-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--teal); flex-shrink: 0;
+  }
+  .sync-dot.error { background: var(--red); }
+  .sync-dot.loading { background: var(--gold); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+  }
+  .page-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+  .content-wrap {
+    display: flex;
+    flex: 1;
+    gap: 0;
+  }
+  .page-content {
+    flex: 1;
+    padding: 28px;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+  .side-panel {
+    width: var(--panel-w);
+    flex-shrink: 0;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    padding: 20px 18px;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+  .panel-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 14px;
+  }
+
+  /* ── TAB PAGES ── */
+  .tab-page { display: none; }
+  .tab-page.active { display: flex; flex-direction: column; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .card-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--navy); }
+  .card-body { padding: 20px; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--teal); color: #fff; }
+  .btn-primary:hover { background: #25a897; }
+  .btn-ghost { background: transparent; color: var(--text-2); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--bg); color: var(--text); }
+  .btn-danger { background: var(--red-light); color: var(--red); border: 1px solid #f8d0d0; }
+  .btn-danger:hover { background: #fae0e0; }
+  .btn-navy { background: var(--navy); color: #fff; }
+  .btn-navy:hover { background: #153351; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-icon { padding: 6px 8px; }
+
+  /* ── FORM ── */
+  .form-grid { display: grid; gap: 14px; }
+  .form-grid-2 { grid-template-columns: 1fr 1fr; }
+  .form-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  label { font-size: 12px; font-weight: 600; color: var(--text-2); }
+  input, select, textarea {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg);
+    transition: border .15s, box-shadow .15s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(44,191,173,0.12);
+    background: #fff;
+  }
+  textarea { resize: vertical; min-height: 72px; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: var(--bg);
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--text-2);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--teal-light); }
+
+  /* ── CHIPS / BADGES ── */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+  .chip-teal { background: var(--teal-light); color: #1a9184; }
+  .chip-gold { background: var(--gold-light); color: #b97a12; }
+  .chip-green { background: var(--green-light); color: #1a7d4e; }
+  .chip-red { background: var(--red-light); color: var(--red); }
+  .chip-grey { background: #f1f5f9; color: var(--text-2); }
+
+  /* ── AVATAR ── */
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .av-0 { background: #e0f0ff; color: #1a6fb5; }
+  .av-1 { background: var(--teal-light); color: #1a9184; }
+  .av-2 { background: var(--gold-light); color: #b97a12; }
+  .av-3 { background: #f0e8ff; color: #6b3cba; }
+  .av-4 { background: var(--red-light); color: var(--red); }
+  .av-5 { background: var(--green-light); color: var(--green); }
+
+  /* ── SECTION HEADER ── */
+  .section-hd {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .section-hd h2 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(15,30,50,0.5);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    width: 560px;
+    max-width: 95vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-xl { width: 860px; }
+  .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-title { font-size: 16px; font-weight: 700; color: var(--navy); }
+  .modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex; gap: 10px; justify-content: flex-end;
+  }
+  .close-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 20px; color: var(--text-3); line-height: 1;
+    padding: 2px;
+  }
+  .close-btn:hover { color: var(--text); }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 28px; right: 28px;
+    background: var(--navy);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    z-index: 999;
+    opacity: 0; transform: translateY(10px);
+    transition: all .25s;
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; transform: translateY(0); }
+  #toast.success { background: var(--green); }
+  #toast.error { background: var(--red); }
+
+  /* ── LOADING ── */
+  .loading-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(255,255,255,0.85);
+    z-index: 500;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 14px;
+  }
+  .loading-overlay.show { display: flex; }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--teal);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── FÉRIAS CALENDAR ── */
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+  .cal-hd {
+    text-align: center;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--text-3);
+    padding: 6px 0;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    border-radius: 6px;
+    cursor: default;
+    position: relative;
+  }
+  .cal-day.today {
+    background: var(--navy);
+    color: #fff;
+    font-weight: 700;
+  }
+  .cal-day.ferias { background: var(--teal); color: #fff; font-weight: 600; }
+  .cal-day.ferias-start { border-radius: 6px 0 0 6px; }
+  .cal-day.ferias-end { border-radius: 0 6px 6px 0; }
+  .cal-day.other-month { color: var(--text-3); }
+  .cal-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .cal-nav-title {
+    font-size: 13px; font-weight: 700; color: var(--navy);
+    text-transform: capitalize;
+  }
+  .cal-nav-btn {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 4px 8px; cursor: pointer;
+    font-size: 13px; color: var(--text-2);
+    transition: all .15s;
+  }
+  .cal-nav-btn:hover { background: var(--teal-light); color: var(--navy); }
+
+  /* ── BANCO HORAS ── */
+  .bh-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: box-shadow .15s;
+    margin-bottom: 10px;
+  }
+  .bh-card:hover { box-shadow: var(--shadow); }
+  .bh-saldo {
+    margin-left: auto;
+    font-size: 20px;
+    font-weight: 800;
+    min-width: 70px;
+    text-align: right;
+  }
+  .bh-saldo.pos { color: var(--green); }
+  .bh-saldo.neg { color: var(--red); }
+  .bh-saldo.zero { color: var(--text-3); }
+  .bh-meta { font-size: 11.5px; color: var(--text-3); }
+
+  /* ── FEEDBACK TIMELINE ── */
+  .fb-person {
+    margin-bottom: 28px;
+  }
+  .fb-person-hd {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--teal-light);
+  }
+  .fb-person-name { font-size: 16px; font-weight: 700; color: var(--navy); }
+  .fb-cycles {
+    display: flex; flex-direction: column; gap: 0;
+    position: relative;
+    padding-left: 20px;
+  }
+  .fb-cycles::before {
+    content: '';
+    position: absolute;
+    left: 6px; top: 8px; bottom: 8px;
+    width: 2px;
+    background: var(--border);
+    border-radius: 2px;
+  }
+  .fb-cycle {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .fb-cycle::before {
+    content: '';
+    position: absolute;
+    left: -17px; top: 13px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--teal);
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--teal);
+  }
+  .fb-cycle-hd {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--navy);
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .fb-cycle-date { font-size: 12px; font-weight: 700; color: var(--teal); }
+  .fb-cycle-toggle { color: rgba(255,255,255,0.5); font-size: 13px; }
+  .fb-cycle-body {
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    background: var(--surface);
+    display: none;
+  }
+  .fb-cycle-body.open { display: block; }
+  .fb-section {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .fb-section:last-child { border-bottom: none; }
+  .fb-section-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 6px;
+  }
+  .fb-section-value {
+    font-size: 13px;
+    color: var(--text);
+    white-space: pre-wrap;
+    line-height: 1.6;
+  }
+  .fb-section-empty { color: var(--text-3); font-style: italic; font-size: 12px; }
+
+  /* ── PDI ── */
+  .pdi-item {
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    margin-bottom: 8px;
+  }
+  .pdi-obj { font-weight: 600; font-size: 13.5px; color: var(--navy); margin-bottom: 6px; }
+  .pdi-row { font-size: 12px; color: var(--text-2); margin-bottom: 3px; }
+  .pdi-row strong { color: var(--text); }
+
+  /* ── METAS ── */
+  .meta-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    margin-bottom: 8px;
+  }
+  .meta-prog { flex: 1; }
+  .meta-prog-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 5px;
+  }
+  .meta-prog-fill { height: 100%; border-radius: 3px; background: var(--teal); }
+
+  /* ── HOME OFFICE ── */
+  .ho-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .ho-card {
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .ho-name { font-weight: 700; font-size: 13.5px; color: var(--navy); margin-bottom: 4px; }
+  .ho-date { font-size: 12px; color: var(--text-2); }
+  .ho-motivo { font-size: 12px; color: var(--text-3); margin-top: 6px; }
+
+  /* ── PANEL items ── */
+  .panel-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-item:last-child { border-bottom: none; }
+  .panel-item-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .panel-item-sub { font-size: 11.5px; color: var(--text-2); margin-top: 2px; }
+  .panel-item-sub b { color: var(--navy); }
+  .panel-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 5px;
+  }
+  .pd-teal { background: var(--teal); }
+  .pd-gold { background: var(--gold); }
+  .pd-green { background: var(--green); }
+  .pd-red { background: var(--red); }
+
+  /* ── SETTINGS ── */
+  .colabs-list { display: flex; flex-direction: column; gap: 8px; }
+  .colab-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+  }
+  .colab-row input {
+    flex: 1; background: transparent; border: none; font-weight: 600;
+    font-size: 13px; color: var(--text);
+    padding: 0;
+  }
+  .colab-row input:focus { box-shadow: none; outline: none; }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .filter-bar select, .filter-bar input {
+    padding: 7px 12px; font-size: 13px;
+  }
+
+  /* ── MISC ── */
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-3);
+  }
+  .empty-state .big { font-size: 36px; margin-bottom: 10px; }
+  .empty-state p { font-size: 13.5px; }
+
+  .row-actions { display: flex; gap: 6px; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+
+  .tag-pessoas {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;
+  }
+  .tag-pessoa {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: var(--teal-light);
+    color: #1a9184;
+  }
+
+  /* responsive hide panel on small screens */
+  @media (max-width: 1200px) {
+    .side-panel { display: none; }
+  }
+  @media (max-width: 900px) {
+    .sidebar { width: 60px; }
+    .sidebar-logo .brand, .sidebar-logo .sub,
+    .nav-label, .nav-item span { display: none; }
+    .nav-item { justify-content: center; padding: 10px; }
+    .main { margin-left: 60px; }
+  }
+
+  /* config page */
+  .config-section { margin-bottom: 28px; }
+  .config-section h3 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+
+  .fb-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .fb-tab {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-2);
+    background: var(--surface);
+    transition: all .15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .fb-tab:hover { border-color: var(--teal); color: var(--teal); }
+  .fb-tab.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+  .highlight-today {
+    background: rgba(44,191,173,0.1);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 12.5px;
+    color: var(--navy);
+  }
+  .highlight-today strong { color: var(--teal); }
+
+  .no-data { color: var(--text-3); font-style: italic; font-size: 12.5px; text-align: center; padding: 20px; }
+
+  /* Feedback form sections */
+  .fb-form-section { margin-bottom: 18px; }
+  .fb-form-section-title {
+    font-size: 11px; font-weight: 700; letter-spacing: .8px;
+    text-transform: uppercase; color: var(--teal);
+    margin-bottom: 6px;
+  }
+  .pdi-form-block {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    background: var(--bg);
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ──────────────────────────────────── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">ICM · Time</div>
+    <div class="sub">Gestão de Pessoas</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Módulos</div>
+    <div class="nav-item active" onclick="showTab('ferias')">
+      <span class="icon">🌴</span><span>Férias</span>
+    </div>
+    <div class="nav-item" onclick="showTab('banco')">
+      <span class="icon">⏱️</span><span>Banco de Horas</span>
+    </div>
+    <div class="nav-item" onclick="showTab('homeoffice')">
+      <span class="icon">🏠</span><span>Home Office / Ausências</span>
+    </div>
+    <div class="nav-item" onclick="showTab('feedbacks')">
+      <span class="icon">💬</span><span>Feedbacks & PDI</span>
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Sistema</div>
+    <div class="nav-item" onclick="showTab('config')">
+      <span class="icon">⚙️</span><span>Configurações</span>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="sync-status">
+      <div class="sync-dot loading" id="syncDot"></div>
+      <span id="syncLabel">Conectando...</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ── MAIN ──────────────────────────────────────── -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="page-title" id="pageTitle">🌴 Férias</div>
+    <div class="topbar-actions">
+      <button class="btn btn-primary" id="btnTopAction" onclick="openTopAction()">+ Registrar</button>
+      <button class="btn btn-ghost btn-sm" onclick="syncData()" title="Sincronizar com Sheets">↻ Sync</button>
+    </div>
+  </div>
+
+  <div class="content-wrap">
+
+    <!-- ═══ FÉRIAS ═══ -->
+    <div class="tab-page active page-content" id="tab-ferias">
+      <div class="section-hd">
+        <h2>📋 Registros de Férias</h2>
+        <div class="filter-bar" style="margin-bottom:0">
+          <select id="feriasFiltroColab" onchange="renderFerias()">
+            <option value="">Todos os colaboradores</option>
+          </select>
+          <select id="feriasFiltroAno" onchange="renderFerias()">
+            <option value="">Todos os anos</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table id="tblFerias">
+            <thead>
+              <tr>
+                <th>Colaborador</th>
+                <th>Início</th>
+                <th>Retorno</th>
+                <th>Dias</th>
+                <th>Observação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyFerias"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BANCO HORAS ═══ -->
+    <div class="tab-page page-content" id="tab-banco">
+      <div class="section-hd">
+        <h2>⏱️ Saldo de Horas</h2>
+      </div>
+      <div id="listaBH"></div>
+    </div>
+
+    <!-- ═══ HOME OFFICE ═══ -->
+    <div class="tab-page page-content" id="tab-homeoffice">
+      <div class="section-hd">
+        <h2>📍 Home Office &amp; Ausências</h2>
+        <div class="filter-bar" style="margin-bottom:0">
+          <select id="hoFiltroColab" onchange="renderHO()">
+            <option value="">Todos</option>
+          </select>
+          <select id="hoFiltroTipo" onchange="renderHO()">
+            <option value="">Todos os tipos</option>
+            <option value="Home Office">Home Office</option>
+            <option value="Ausência">Ausência</option>
+          </select>
+          <input type="month" id="hoFiltroMes" onchange="renderHO()">
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Colaborador</th>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Período</th>
+                <th>Motivo</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyHO"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FEEDBACKS ═══ -->
+    <div class="tab-page page-content" id="tab-feedbacks">
+      <div class="fb-tabs" id="fbTabs"></div>
+      <div id="fbConteudo"></div>
+    </div>
+
+    <!-- ═══ CONFIG ═══ -->
+    <div class="tab-page page-content" id="tab-config">
+      <div class="config-section">
+        <h3>🔗 Conexão com Google Sheets</h3>
+        <div class="card card-body" style="padding:20px">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>URL do Google Apps Script (Web App)</label>
+              <input type="url" id="cfgScript" placeholder="https://script.google.com/macros/s/.../exec">
+            </div>
+            <div class="form-group">
+              <label>Chave Secreta</label>
+              <input type="password" id="cfgKey" placeholder="sua_chave_secreta">
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px">
+            <button class="btn btn-primary" onclick="saveConfig()">💾 Salvar conexão</button>
+            <button class="btn btn-ghost" onclick="testConnection()">🔍 Testar conexão</button>
+          </div>
+        </div>
+      </div>
+      <div class="config-section">
+        <h3>👥 Colaboradores</h3>
+        <div class="card card-body" style="padding:20px">
+          <div class="colabs-list" id="colabsList"></div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="addColab()">+ Adicionar colaborador</button>
+          <div style="margin-top:14px">
+            <button class="btn btn-primary" onclick="saveColabs()">💾 Salvar colaboradores</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content-wrap without side panels on feedback/config -->
+
+  <!-- SIDE PANELS (rendered per tab) -->
+  <div class="side-panel" id="sidePanel" style="display:none"></div>
+</div><!-- .main for non-panel tabs -->
+
+<!-- override: side panel is inside content-wrap for tabs that need it -->
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  MODAIS                                        -->
+<!-- ══════════════════════════════════════════════ -->
+
+<!-- Modal Férias -->
+<div class="modal-overlay" id="modalFerias">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="mFeriasTitle">Registrar Férias</div>
+      <button class="close-btn" onclick="closeModal('modalFerias')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Colaborador</label>
+          <select id="mfColab"></select>
+        </div>
+        <div class="form-group">
+          <label>Data de Início</label>
+          <input type="date" id="mfInicio" oninput="calcDias()">
+        </div>
+        <div class="form-group">
+          <label>Data de Retorno</label>
+          <input type="date" id="mfRetorno" oninput="calcDias()">
+        </div>
+        <div class="form-group">
+          <label>Dias calculados</label>
+          <input type="number" id="mfDias" readonly placeholder="Calculado automaticamente">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Observação</label>
+          <input type="text" id="mfObs" placeholder="Ex: férias 2025, parcelado, etc">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalFerias')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveFerias()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Banco Horas -->
+<div class="modal-overlay" id="modalBH">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="mBHTitle">Banco de Horas</div>
+      <button class="close-btn" onclick="closeModal('modalBH')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Colaborador</label>
+          <select id="mbColab"></select>
+        </div>
+        <div class="form-group">
+          <label>Saldo (horas, use - para negativo)</label>
+          <input type="number" id="mbSaldo" placeholder="Ex: 8 ou -3.5" step="0.5">
+        </div>
+        <div class="form-group">
+          <label>Data de referência</label>
+          <input type="date" id="mbDataRef">
+        </div>
+        <div class="form-group">
+          <label>Data da verificação</label>
+          <input type="date" id="mbDataVerif">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Justificativa</label>
+          <textarea id="mbJustif" placeholder="Descreva o motivo do saldo..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalBH')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveBH()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Home Office -->
+<div class="modal-overlay" id="modalHO">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="mHOTitle">Registrar Home Office / Ausência</div>
+      <button class="close-btn" onclick="closeModal('modalHO')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Colaborador</label>
+          <select id="mhColab"></select>
+        </div>
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" id="mhData">
+        </div>
+        <div class="form-group">
+          <label>Tipo</label>
+          <select id="mhTipo">
+            <option>Home Office</option>
+            <option>Ausência</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Período</label>
+          <select id="mhPeriodo">
+            <option>Dia inteiro</option>
+            <option>Manhã</option>
+            <option>Tarde</option>
+            <option>Parcial</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Motivo</label>
+          <input type="text" id="mhMotivo" placeholder="Ex: consulta médica, trabalho remoto, etc">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalHO')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveHO()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Feedback -->
+<div class="modal-overlay" id="modalFB">
+  <div class="modal modal-xl">
+    <div class="modal-header">
+      <div class="modal-title" id="mFBTitle">Novo Ciclo de Feedback</div>
+      <button class="close-btn" onclick="closeModal('modalFB')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid form-grid-2">
+        <div class="form-group">
+          <label>Colaborador</label>
+          <select id="mfbColab"></select>
+        </div>
+        <div class="form-group">
+          <label>Data do Feedback</label>
+          <input type="date" id="mfbData">
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="form-grid">
+        <div class="fb-form-section">
+          <div class="fb-form-section-title">📌 Anotações para próximo feedback</div>
+          <textarea id="mfbAnotacoes" placeholder="Pontos a abordar no próximo ciclo..."></textarea>
+        </div>
+        <div class="fb-form-section">
+          <div class="fb-form-section-title">✅ Pontos fortes</div>
+          <textarea id="mfbFortes" placeholder="O que o colaborador tem se destacado..."></textarea>
+        </div>
+        <div class="fb-form-section">
+          <div class="fb-form-section-title">📈 Evolução</div>
+          <textarea id="mfbEvolucao" placeholder="O que melhorou desde o último ciclo..."></textarea>
+        </div>
+        <div class="fb-form-section">
+          <div class="fb-form-section-title">⚠️ Pontos a melhorar</div>
+          <textarea id="mfbMelhorar" placeholder="Comportamentos ou entregas a desenvolver..."></textarea>
+        </div>
+        <div class="fb-form-section">
+          <div class="fb-form-section-title">💬 Pontos levantados pelo colaborador</div>
+          <textarea id="mfbColab2" placeholder="O que o colaborador trouxe na conversa..."></textarea>
+        </div>
+        <div class="fb-form-section">
+          <div class="fb-form-section-title">🎯 Próximos passos</div>
+          <textarea id="mfbPassos" placeholder="Acordos e comprometimentos..."></textarea>
+        </div>
+        <div class="fb-form-section">
+          <div class="fb-form-section-title">📣 Outros recados</div>
+          <textarea id="mfbOutros" placeholder="Informações adicionais..."></textarea>
+        </div>
+        <div class="fb-form-section">
+          <div class="fb-form-section-title">📋 Resumo Feedback Conecta/Evolui</div>
+          <textarea id="mfbConecta" placeholder="Resumo para o sistema oficial..."></textarea>
+        </div>
+        <div class="fb-form-section">
+          <div class="fb-form-section-title">👏 Feedbacks públicos (Conecta)</div>
+          <textarea id="mfbPublico" placeholder="Reconhecimentos públicos registrados..."></textarea>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="fb-form-section-title" style="margin-bottom:10px">📘 PDI — Plano de Desenvolvimento Individual</div>
+      <div id="pdiFormList"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addPDIForm()">+ Adicionar objetivo PDI</button>
+      <hr class="divider">
+      <div class="fb-form-section-title" style="margin-bottom:10px">🎯 Metas &amp; Andamento</div>
+      <div id="metasFormList"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addMetaForm()">+ Adicionar meta</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalFB')">Cancelar</button>
+      <button class="btn btn-navy" onclick="saveFeedback()">💾 Salvar Ciclo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Exportar Ficha -->
+<div class="modal-overlay" id="modalFicha">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📄 Exportar Ficha</div>
+      <button class="close-btn" onclick="closeModal('modalFicha')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Colaborador</label>
+        <select id="fichaColab" onchange="previewFicha()"></select>
+      </div>
+      <div id="fichaPreview" style="margin-top:16px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalFicha')">Fechar</button>
+      <button class="btn btn-primary" onclick="exportFicha()">⬇️ Exportar PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <span style="font-size:13px;color:var(--text-2)">Sincronizando com Sheets...</span>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  ESTADO CENTRAL
+// ═══════════════════════════════════════════════
+let STATE = {
+  colaboradores: ['Davi','Juliana','Fernanda','Lucas','Andrezza'],
+  ferias: [],
+  bancoHoras: [],
+  homeoffice: [],
+  feedbacks: [],
+  scriptUrl: '',
+  secretKey: ''
+};
+
+let editingId = null;
+let currentTab = 'ferias';
+let calendarDate = new Date();
+let fbColabAtivo = null;
+
+// ═══════════════════════════════════════════════
+//  CONFIG & LOCAL PERSISTENCE (só config, não dados)
+// ═══════════════════════════════════════════════
+function loadConfig() {
+  const cfg = localStorage.getItem('icm_team_config');
+  if (cfg) {
+    const c = JSON.parse(cfg);
+    STATE.scriptUrl = c.scriptUrl || '';
+    STATE.secretKey = c.secretKey || '';
+    STATE.colaboradores = c.colaboradores || STATE.colaboradores;
+  }
+  document.getElementById('cfgScript').value = STATE.scriptUrl;
+  document.getElementById('cfgKey').value = STATE.secretKey;
+  renderColabsConfig();
+}
+
+function saveConfig() {
+  STATE.scriptUrl = document.getElementById('cfgScript').value.trim();
+  STATE.secretKey = document.getElementById('cfgKey').value.trim();
+  localStorage.setItem('icm_team_config', JSON.stringify({
+    scriptUrl: STATE.scriptUrl,
+    secretKey: STATE.secretKey,
+    colaboradores: STATE.colaboradores
+  }));
+  toast('Configurações salvas!', 'success');
+  syncData();
+}
+
+function saveColabs() {
+  const rows = document.querySelectorAll('.colab-row input');
+  STATE.colaboradores = [...rows].map(r => r.value.trim()).filter(Boolean);
+  localStorage.setItem('icm_team_config', JSON.stringify({
+    scriptUrl: STATE.scriptUrl,
+    secretKey: STATE.secretKey,
+    colaboradores: STATE.colaboradores
+  }));
+  toast('Colaboradores salvos!', 'success');
+  repopulateSelects();
+  renderAll();
+}
+
+function addColab() {
+  const list = document.getElementById('colabsList');
+  const row = document.createElement('div');
+  row.className = 'colab-row';
+  row.innerHTML = `<input type="text" placeholder="Nome do colaborador">
+    <button class="btn btn-danger btn-sm btn-icon" onclick="this.closest('.colab-row').remove()">✕</button>`;
+  list.appendChild(row);
+}
+
+function renderColabsConfig() {
+  const list = document.getElementById('colabsList');
+  list.innerHTML = '';
+  STATE.colaboradores.forEach(c => {
+    const row = document.createElement('div');
+    row.className = 'colab-row';
+    row.innerHTML = `<input type="text" value="${c}">
+      <button class="btn btn-danger btn-sm btn-icon" onclick="this.closest('.colab-row').remove()">✕</button>`;
+    list.appendChild(row);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  SHEETS API
+// ═══════════════════════════════════════════════
+async function sheetsRequest(action, payload = {}) {
+  if (!STATE.scriptUrl) throw new Error('URL do script não configurada');
+  const body = { action, key: STATE.secretKey, ...payload };
+  const res = await fetch(STATE.scriptUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+async function syncData() {
+  if (!STATE.scriptUrl) {
+    setSyncStatus('Sem conexão', 'error');
+    return;
+  }
+  setSyncStatus('Sincronizando...', 'loading');
+  showLoading(true);
+  try {
+    const data = await sheetsRequest('getAll');
+    if (data.ferias) STATE.ferias = data.ferias;
+    if (data.bancoHoras) STATE.bancoHoras = data.bancoHoras;
+    if (data.homeoffice) STATE.homeoffice = data.homeoffice;
+    if (data.feedbacks) STATE.feedbacks = data.feedbacks;
+    setSyncStatus('Sincronizado', 'ok');
+    renderAll();
+    toast('Dados sincronizados!', 'success');
+  } catch(e) {
+    setSyncStatus('Erro de conexão', 'error');
+    toast('Erro: ' + e.message, 'error');
+  } finally {
+    showLoading(false);
+  }
+}
+
+async function testConnection() {
+  STATE.scriptUrl = document.getElementById('cfgScript').value.trim();
+  STATE.secretKey = document.getElementById('cfgKey').value.trim();
+  toast('Testando conexão...');
+  try {
+    const data = await sheetsRequest('ping');
+    toast('✅ Conexão OK: ' + (data.msg || 'funcionando'), 'success');
+  } catch(e) {
+    toast('❌ Erro: ' + e.message, 'error');
+  }
+}
+
+async function saveRecord(sheet, record) {
+  showLoading(true);
+  try {
+    const res = await sheetsRequest('save', { sheet, record });
+    if (res.id) record.id = res.id;
+    setSyncStatus('Sincronizado', 'ok');
+    return res;
+  } catch(e) {
+    toast('Erro ao salvar: ' + e.message, 'error');
+    throw e;
+  } finally {
+    showLoading(false);
+  }
+}
+
+async function deleteRecord(sheet, id) {
+  showLoading(true);
+  try {
+    await sheetsRequest('delete', { sheet, id });
+    setSyncStatus('Sincronizado', 'ok');
+  } catch(e) {
+    toast('Erro ao excluir: ' + e.message, 'error');
+    throw e;
+  } finally {
+    showLoading(false);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  NAVEGAÇÃO
+// ═══════════════════════════════════════════════
+const tabTitles = {
+  ferias: '🌴 Férias',
+  banco: '⏱️ Banco de Horas',
+  homeoffice: '🏠 Home Office & Ausências',
+  feedbacks: '💬 Feedbacks & PDI',
+  config: '⚙️ Configurações'
+};
+
+const topActions = {
+  ferias: 'openModalFerias',
+  banco: 'openModalBH',
+  homeoffice: 'openModalHO',
+  feedbacks: 'openModalFB',
+  config: null
+};
+
+function showTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(i => {
+    if (i.getAttribute('onclick')?.includes(tab)) i.classList.add('active');
+  });
+  document.getElementById('pageTitle').textContent = tabTitles[tab];
+  const btn = document.getElementById('btnTopAction');
+  if (topActions[tab]) {
+    btn.style.display = '';
+    btn.textContent = tab === 'feedbacks' ? '+ Novo Ciclo' :
+                      tab === 'banco' ? '+ Atualizar Saldo' : '+ Registrar';
+  } else {
+    btn.style.display = 'none';
+  }
+  renderSidePanel(tab);
+  if (tab === 'feedbacks') renderFBTabs();
+}
+
+function openTopAction() {
+  const actions = {
+    ferias: openModalFerias,
+    banco: openModalBH,
+    homeoffice: openModalHO,
+    feedbacks: openModalFB
+  };
+  if (actions[currentTab]) actions[currentTab]();
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER ALL
+// ═══════════════════════════════════════════════
+function renderAll() {
+  repopulateSelects();
+  renderFerias();
+  renderBH();
+  renderHO();
+  if (currentTab === 'feedbacks') renderFBTabs();
+  renderSidePanel(currentTab);
+}
+
+function repopulateSelects() {
+  const selIds = ['mfColab','mbColab','mhColab','mfbColab',
+                  'feriasFiltroColab','hoFiltroColab','fichaColab'];
+  selIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const isFilter = id.includes('Filtro') || id === 'fichaColab';
+    const cur = el.value;
+    el.innerHTML = (isFilter ? '<option value="">Todos</option>' : '');
+    STATE.colaboradores.forEach(c => {
+      el.innerHTML += `<option value="${c}">${c}</option>`;
+    });
+    if (cur) el.value = cur;
+  });
+  // anos para férias
+  const anoSel = document.getElementById('feriasFiltroAno');
+  if (anoSel) {
+    const anos = [...new Set(STATE.ferias.map(f => f.inicio?.slice(0,4)))].filter(Boolean).sort();
+    anoSel.innerHTML = '<option value="">Todos os anos</option>';
+    anos.forEach(a => anoSel.innerHTML += `<option>${a}</option>`);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  FÉRIAS
+// ═══════════════════════════════════════════════
+function openModalFerias(id = null) {
+  editingId = id;
+  document.getElementById('mFeriasTitle').textContent = id ? 'Editar Férias' : 'Registrar Férias';
+  if (id) {
+    const r = STATE.ferias.find(f => f.id === id);
+    if (r) {
+      document.getElementById('mfColab').value = r.colab;
+      document.getElementById('mfInicio').value = r.inicio;
+      document.getElementById('mfRetorno').value = r.retorno;
+      document.getElementById('mfDias').value = r.dias;
+      document.getElementById('mfObs').value = r.obs || '';
+    }
+  } else {
+    document.getElementById('mfColab').value = STATE.colaboradores[0];
+    document.getElementById('mfInicio').value = '';
+    document.getElementById('mfRetorno').value = '';
+    document.getElementById('mfDias').value = '';
+    document.getElementById('mfObs').value = '';
+  }
+  openModal('modalFerias');
+}
+
+function calcDias() {
+  const i = document.getElementById('mfInicio').value;
+  const r = document.getElementById('mfRetorno').value;
+  if (i && r) {
+    const di = new Date(i), dr = new Date(r);
+    const diff = Math.round((dr - di) / 86400000);
+    document.getElementById('mfDias').value = diff > 0 ? diff : '';
+  }
+}
+
+async function saveFerias() {
+  const record = {
+    id: editingId || genId(),
+    colab: document.getElementById('mfColab').value,
+    inicio: document.getElementById('mfInicio').value,
+    retorno: document.getElementById('mfRetorno').value,
+    dias: document.getElementById('mfDias').value,
+    obs: document.getElementById('mfObs').value
+  };
+  if (!record.colab || !record.inicio || !record.retorno) {
+    toast('Preencha os campos obrigatórios', 'error'); return;
+  }
+  try {
+    await saveRecord('ferias', record);
+    if (editingId) {
+      const idx = STATE.ferias.findIndex(f => f.id === editingId);
+      if (idx >= 0) STATE.ferias[idx] = record;
+    } else {
+      STATE.ferias.push(record);
+    }
+    closeModal('modalFerias');
+    renderAll();
+    toast('Férias salvas!', 'success');
+  } catch(e) {}
+}
+
+async function deleteFerias(id) {
+  if (!confirm('Excluir este registro?')) return;
+  try {
+    await deleteRecord('ferias', id);
+    STATE.ferias = STATE.ferias.filter(f => f.id !== id);
+    renderAll();
+    toast('Registro excluído');
+  } catch(e) {}
+}
+
+function renderFerias() {
+  const tbody = document.getElementById('tbodyFerias');
+  const filtColab = document.getElementById('feriasFiltroColab')?.value || '';
+  const filtAno = document.getElementById('feriasFiltroAno')?.value || '';
+  let data = [...STATE.ferias].sort((a,b) => a.inicio > b.inicio ? 1 : -1);
+  if (filtColab) data = data.filter(f => f.colab === filtColab);
+  if (filtAno) data = data.filter(f => f.inicio?.startsWith(filtAno));
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="no-data">Nenhum registro encontrado</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map((f,i) => {
+    const av = avHtml(f.colab);
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px">${av}<span>${f.colab}</span></div></td>
+      <td>${fmtDate(f.inicio)}</td>
+      <td>${fmtDate(f.retorno)}</td>
+      <td><span class="chip chip-teal">${f.dias} dias</span></td>
+      <td style="color:var(--text-2)">${f.obs || '—'}</td>
+      <td><div class="row-actions">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="openModalFerias('${f.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteFerias('${f.id}')">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  BANCO DE HORAS
+// ═══════════════════════════════════════════════
+function openModalBH(id = null) {
+  editingId = id;
+  document.getElementById('mBHTitle').textContent = id ? 'Editar Saldo' : 'Atualizar Banco de Horas';
+  if (id) {
+    const r = STATE.bancoHoras.find(b => b.id === id);
+    if (r) {
+      document.getElementById('mbColab').value = r.colab;
+      document.getElementById('mbSaldo').value = r.saldo;
+      document.getElementById('mbDataRef').value = r.dataRef || '';
+      document.getElementById('mbDataVerif').value = r.dataVerif || '';
+      document.getElementById('mbJustif').value = r.justif || '';
+    }
+  } else {
+    document.getElementById('mbColab').value = STATE.colaboradores[0];
+    document.getElementById('mbSaldo').value = '';
+    document.getElementById('mbDataRef').value = today();
+    document.getElementById('mbDataVerif').value = today();
+    document.getElementById('mbJustif').value = '';
+  }
+  openModal('modalBH');
+}
+
+async function saveBH() {
+  const record = {
+    id: editingId || genId(),
+    colab: document.getElementById('mbColab').value,
+    saldo: parseFloat(document.getElementById('mbSaldo').value) || 0,
+    dataRef: document.getElementById('mbDataRef').value,
+    dataVerif: document.getElementById('mbDataVerif').value,
+    justif: document.getElementById('mbJustif').value
+  };
+  if (!record.colab) { toast('Selecione o colaborador', 'error'); return; }
+  try {
+    await saveRecord('bancoHoras', record);
+    if (editingId) {
+      const idx = STATE.bancoHoras.findIndex(b => b.id === editingId);
+      if (idx >= 0) STATE.bancoHoras[idx] = record;
+    } else {
+      STATE.bancoHoras.push(record);
+    }
+    closeModal('modalBH');
+    renderAll();
+    toast('Banco de horas atualizado!', 'success');
+  } catch(e) {}
+}
+
+async function deleteBH(id) {
+  if (!confirm('Excluir registro?')) return;
+  try {
+    await deleteRecord('bancoHoras', id);
+    STATE.bancoHoras = STATE.bancoHoras.filter(b => b.id !== id);
+    renderAll();
+    toast('Registro excluído');
+  } catch(e) {}
+}
+
+function renderBH() {
+  const container = document.getElementById('listaBH');
+  if (!container) return;
+  if (!STATE.bancoHoras.length) {
+    container.innerHTML = `<div class="empty-state"><div class="big">⏱️</div><p>Nenhum saldo registrado ainda.</p></div>`;
+    return;
+  }
+  // agrupar por colaborador: pegar o mais recente
+  const porColab = {};
+  STATE.bancoHoras.forEach(b => {
+    if (!porColab[b.colab] || b.dataVerif > porColab[b.colab].dataVerif) {
+      porColab[b.colab] = b;
+    }
+  });
+  container.innerHTML = STATE.colaboradores.map((c,i) => {
+    const r = porColab[c];
+    if (!r) return `<div class="bh-card">
+      ${avHtml(c, i)}
+      <div>
+        <div style="font-weight:700">${c}</div>
+        <div class="bh-meta">Sem registro</div>
+      </div>
+      <div class="bh-saldo zero">—</div>
+      <button class="btn btn-ghost btn-sm" onclick="openModalBH()">+ Lançar</button>
+    </div>`;
+    const cls = r.saldo > 0 ? 'pos' : r.saldo < 0 ? 'neg' : 'zero';
+    const sign = r.saldo > 0 ? '+' : '';
+    return `<div class="bh-card">
+      ${avHtml(c, i)}
+      <div>
+        <div style="font-weight:700">${c}</div>
+        <div class="bh-meta">Ref.: ${fmtDate(r.dataRef)} · Verificado: ${fmtDate(r.dataVerif)}</div>
+        ${r.justif ? `<div class="bh-meta" style="margin-top:3px;max-width:360px">${r.justif}</div>` : ''}
+      </div>
+      <div class="bh-saldo ${cls}">${sign}${r.saldo}h</div>
+      <div class="row-actions">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="openModalBH('${r.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteBH('${r.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  HOME OFFICE
+// ═══════════════════════════════════════════════
+function openModalHO(id = null) {
+  editingId = id;
+  if (id) {
+    const r = STATE.homeoffice.find(h => h.id === id);
+    if (r) {
+      document.getElementById('mhColab').value = r.colab;
+      document.getElementById('mhData').value = r.data;
+      document.getElementById('mhTipo').value = r.tipo;
+      document.getElementById('mhPeriodo').value = r.periodo;
+      document.getElementById('mhMotivo').value = r.motivo || '';
+    }
+  } else {
+    document.getElementById('mhColab').value = STATE.colaboradores[0];
+    document.getElementById('mhData').value = today();
+    document.getElementById('mhTipo').value = 'Home Office';
+    document.getElementById('mhPeriodo').value = 'Dia inteiro';
+    document.getElementById('mhMotivo').value = '';
+  }
+  openModal('modalHO');
+}
+
+async function saveHO() {
+  const record = {
+    id: editingId || genId(),
+    colab: document.getElementById('mhColab').value,
+    data: document.getElementById('mhData').value,
+    tipo: document.getElementById('mhTipo').value,
+    periodo: document.getElementById('mhPeriodo').value,
+    motivo: document.getElementById('mhMotivo').value
+  };
+  if (!record.colab || !record.data) { toast('Preencha os campos obrigatórios', 'error'); return; }
+  try {
+    await saveRecord('homeoffice', record);
+    if (editingId) {
+      const idx = STATE.homeoffice.findIndex(h => h.id === editingId);
+      if (idx >= 0) STATE.homeoffice[idx] = record;
+    } else {
+      STATE.homeoffice.push(record);
+    }
+    closeModal('modalHO');
+    renderAll();
+    toast('Registro salvo!', 'success');
+  } catch(e) {}
+}
+
+async function deleteHO(id) {
+  if (!confirm('Excluir registro?')) return;
+  try {
+    await deleteRecord('homeoffice', id);
+    STATE.homeoffice = STATE.homeoffice.filter(h => h.id !== id);
+    renderAll();
+    toast('Registro excluído');
+  } catch(e) {}
+}
+
+function renderHO() {
+  const tbody = document.getElementById('tbodyHO');
+  if (!tbody) return;
+  const filtColab = document.getElementById('hoFiltroColab')?.value || '';
+  const filtTipo = document.getElementById('hoFiltroTipo')?.value || '';
+  const filtMes = document.getElementById('hoFiltroMes')?.value || '';
+  let data = [...STATE.homeoffice].sort((a,b) => b.data > a.data ? 1 : -1);
+  if (filtColab) data = data.filter(h => h.colab === filtColab);
+  if (filtTipo) data = data.filter(h => h.tipo === filtTipo);
+  if (filtMes) data = data.filter(h => h.data?.startsWith(filtMes));
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="no-data">Nenhum registro encontrado</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(h => {
+    const chipTipo = h.tipo === 'Home Office'
+      ? '<span class="chip chip-teal">🏠 Home Office</span>'
+      : '<span class="chip chip-gold">⚠️ Ausência</span>';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px">${avHtml(h.colab)}<span>${h.colab}</span></div></td>
+      <td>${fmtDate(h.data)}</td>
+      <td>${chipTipo}</td>
+      <td><span class="chip chip-grey">${h.periodo}</span></td>
+      <td style="color:var(--text-2)">${h.motivo || '—'}</td>
+      <td><div class="row-actions">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="openModalHO('${h.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteHO('${h.id}')">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  FEEDBACKS
+// ═══════════════════════════════════════════════
+function renderFBTabs() {
+  const tabsEl = document.getElementById('fbTabs');
+  if (!tabsEl) return;
+  if (!fbColabAtivo) fbColabAtivo = STATE.colaboradores[0];
+  tabsEl.innerHTML = STATE.colaboradores.map(c => {
+    const qty = STATE.feedbacks.filter(f => f.colab === c).length;
+    return `<div class="fb-tab ${c === fbColabAtivo ? 'active' : ''}" onclick="selectFBColab('${c}')">
+      ${avHtml(c)} ${c} ${qty ? `<span style="background:var(--teal);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px">${qty}</span>` : ''}
+    </div>`;
+  }).join('') + `<div class="fb-tab" onclick="openModalFicha()" style="margin-left:auto">
+    📄 Exportar ficha
+  </div>`;
+  renderFBPessoa(fbColabAtivo);
+}
+
+function selectFBColab(c) {
+  fbColabAtivo = c;
+  renderFBTabs();
+}
+
+function renderFBPessoa(colab) {
+  const el = document.getElementById('fbConteudo');
+  if (!el) return;
+  const ciclos = STATE.feedbacks.filter(f => f.colab === colab)
+                  .sort((a,b) => b.data > a.data ? 1 : -1);
+
+  const avIdx = STATE.colaboradores.indexOf(colab);
+  let html = `<div class="fb-person">
+    <div class="fb-person-hd">
+      ${avHtml(colab, avIdx, 44)}
+      <div>
+        <div class="fb-person-name">${colab}</div>
+        <div style="font-size:12px;color:var(--text-3)">${ciclos.length} ciclo(s) de feedback</div>
+      </div>
+      <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openModalFB('${colab}')">+ Novo ciclo</button>
+    </div>`;
+
+  if (!ciclos.length) {
+    html += `<div class="empty-state"><div class="big">💬</div><p>Nenhum feedback registrado ainda para ${colab}.</p></div>`;
+  } else {
+    html += `<div class="fb-cycles">`;
+    ciclos.forEach(c => {
+      html += renderCiclo(c);
+    });
+    html += `</div>`;
+  }
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
+function renderCiclo(c) {
+  const fields = [
+    { key:'anotacoes', label:'📌 Anotações p/ próximo feedback' },
+    { key:'fortes',    label:'✅ Pontos fortes' },
+    { key:'evolucao',  label:'📈 Evolução' },
+    { key:'melhorar',  label:'⚠️ Pontos a melhorar' },
+    { key:'colab2',    label:'💬 Levantados pelo colaborador' },
+    { key:'passos',    label:'🎯 Próximos passos' },
+    { key:'outros',    label:'📣 Outros recados' },
+    { key:'conecta',   label:'📋 Resumo Conecta/Evolui' },
+    { key:'publico',   label:'👏 Feedbacks públicos' }
+  ];
+
+  let body = fields.map(f => `
+    <div class="fb-section">
+      <div class="fb-section-label">${f.label}</div>
+      <div class="fb-section-value ${c[f.key] ? '' : 'fb-section-empty'}">${c[f.key] || 'Não preenchido'}</div>
+    </div>`).join('');
+
+  if (c.pdi && c.pdi.length) {
+    body += `<div class="fb-section"><div class="fb-section-label">📘 PDI</div>`;
+    c.pdi.forEach(p => {
+      body += `<div class="pdi-item">
+        <div class="pdi-obj">${p.objetivo}</div>
+        <div class="pdi-row"><strong>Ações:</strong> ${p.acoes}</div>
+        <div class="pdi-row"><strong>Prazo:</strong> ${fmtDate(p.prazo)} · <strong>Indicadores:</strong> ${p.indicadores}</div>
+      </div>`;
+    });
+    body += `</div>`;
+  }
+
+  if (c.metas && c.metas.length) {
+    body += `<div class="fb-section"><div class="fb-section-label">🎯 Metas</div>`;
+    c.metas.forEach(m => {
+      const pct = Math.min(100, Math.max(0, parseInt(m.pct) || 0));
+      body += `<div class="meta-item">
+        <div class="meta-prog" style="flex:1">
+          <div style="font-weight:600;font-size:13px">${m.descricao}</div>
+          <div class="meta-prog-bar"><div class="meta-prog-fill" style="width:${pct}%"></div></div>
+        </div>
+        <span class="chip ${pct >= 100 ? 'chip-green' : pct > 50 ? 'chip-teal' : 'chip-gold'}">${pct}%</span>
+      </div>`;
+    });
+    body += `</div>`;
+  }
+
+  const id = c.id;
+  return `<div class="fb-cycle">
+    <div class="fb-cycle-hd" onclick="toggleCiclo('${id}')">
+      <span class="fb-cycle-date">📅 ${fmtDate(c.data)}</span>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn btn-ghost btn-sm btn-icon" style="color:#fff" onclick="event.stopPropagation();editFeedback('${id}')">✏️</button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="event.stopPropagation();deleteFeedback('${id}')">🗑️</button>
+        <span class="fb-cycle-toggle" id="toggle-${id}">▼</span>
+      </div>
+    </div>
+    <div class="fb-cycle-body" id="body-${id}">${body}</div>
+  </div>`;
+}
+
+function toggleCiclo(id) {
+  const body = document.getElementById('body-' + id);
+  const tog = document.getElementById('toggle-' + id);
+  if (body) {
+    body.classList.toggle('open');
+    if (tog) tog.textContent = body.classList.contains('open') ? '▲' : '▼';
+  }
+}
+
+function openModalFB(colab = null) {
+  editingId = null;
+  document.getElementById('mFBTitle').textContent = 'Novo Ciclo de Feedback';
+  document.getElementById('mfbColab').value = colab || fbColabAtivo || STATE.colaboradores[0];
+  document.getElementById('mfbData').value = today();
+  ['Anotacoes','Fortes','Evolucao','Melhorar','Colab2','Passos','Outros','Conecta','Publico']
+    .forEach(k => document.getElementById('mfb'+k).value = '');
+  document.getElementById('pdiFormList').innerHTML = '';
+  document.getElementById('metasFormList').innerHTML = '';
+  openModal('modalFB');
+}
+
+function editFeedback(id) {
+  const c = STATE.feedbacks.find(f => f.id === id);
+  if (!c) return;
+  editingId = id;
+  document.getElementById('mFBTitle').textContent = 'Editar Feedback — ' + fmtDate(c.data);
+  document.getElementById('mfbColab').value = c.colab;
+  document.getElementById('mfbData').value = c.data;
+  document.getElementById('mfbAnotacoes').value = c.anotacoes || '';
+  document.getElementById('mfbFortes').value = c.fortes || '';
+  document.getElementById('mfbEvolucao').value = c.evolucao || '';
+  document.getElementById('mfbMelhorar').value = c.melhorar || '';
+  document.getElementById('mfbColab2').value = c.colab2 || '';
+  document.getElementById('mfbPassos').value = c.passos || '';
+  document.getElementById('mfbOutros').value = c.outros || '';
+  document.getElementById('mfbConecta').value = c.conecta || '';
+  document.getElementById('mfbPublico').value = c.publico || '';
+  // PDI
+  document.getElementById('pdiFormList').innerHTML = '';
+  (c.pdi || []).forEach(p => addPDIForm(p));
+  // Metas
+  document.getElementById('metasFormList').innerHTML = '';
+  (c.metas || []).forEach(m => addMetaForm(m));
+  openModal('modalFB');
+}
+
+let pdiCount = 0, metaCount = 0;
+function addPDIForm(data = {}) {
+  pdiCount++;
+  const n = pdiCount;
+  const div = document.createElement('div');
+  div.className = 'pdi-form-block';
+  div.id = 'pdi-block-' + n;
+  div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <span style="font-size:12px;font-weight:700;color:var(--navy)">Objetivo PDI #${n}</span>
+    <button class="btn btn-danger btn-sm btn-icon" onclick="document.getElementById('pdi-block-${n}').remove()">✕</button>
+  </div>
+  <div class="form-grid">
+    <div class="form-group" style="grid-column:1/-1">
+      <label>Objetivo</label>
+      <input type="text" id="pdi-obj-${n}" value="${data.objetivo||''}" placeholder="Ex: Desenvolver habilidade de apresentação">
+    </div>
+    <div class="form-group" style="grid-column:1/-1">
+      <label>Ações práticas</label>
+      <textarea id="pdi-acoes-${n}" placeholder="O que irá fazer para alcançar...">${data.acoes||''}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Prazo</label>
+      <input type="date" id="pdi-prazo-${n}" value="${data.prazo||''}">
+    </div>
+    <div class="form-group">
+      <label>Indicadores de acompanhamento</label>
+      <input type="text" id="pdi-ind-${n}" value="${data.indicadores||''}" placeholder="Como vou medir o progresso">
+    </div>
+  </div>`;
+  document.getElementById('pdiFormList').appendChild(div);
+}
+
+function addMetaForm(data = {}) {
+  metaCount++;
+  const n = metaCount;
+  const div = document.createElement('div');
+  div.className = 'pdi-form-block';
+  div.id = 'meta-block-' + n;
+  div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <span style="font-size:12px;font-weight:700;color:var(--navy)">Meta #${n}</span>
+    <button class="btn btn-danger btn-sm btn-icon" onclick="document.getElementById('meta-block-${n}').remove()">✕</button>
+  </div>
+  <div class="form-grid form-grid-2">
+    <div class="form-group" style="grid-column:1/-1">
+      <label>Descrição da meta</label>
+      <input type="text" id="meta-desc-${n}" value="${data.descricao||''}" placeholder="Ex: Entregar 3 relatórios mensais no prazo">
+    </div>
+    <div class="form-group">
+      <label>% de andamento (0-100)</label>
+      <input type="number" id="meta-pct-${n}" value="${data.pct||0}" min="0" max="100">
+    </div>
+    <div class="form-group">
+      <label>Observação</label>
+      <input type="text" id="meta-obs-${n}" value="${data.obs||''}" placeholder="Contexto adicional">
+    </div>
+  </div>`;
+  document.getElementById('metasFormList').appendChild(div);
+}
+
+async function saveFeedback() {
+  const pdiBlocks = document.querySelectorAll('[id^="pdi-block-"]');
+  const pdi = [...pdiBlocks].map(b => {
+    const n = b.id.replace('pdi-block-','');
+    return {
+      objetivo: document.getElementById('pdi-obj-'+n)?.value || '',
+      acoes: document.getElementById('pdi-acoes-'+n)?.value || '',
+      prazo: document.getElementById('pdi-prazo-'+n)?.value || '',
+      indicadores: document.getElementById('pdi-ind-'+n)?.value || ''
+    };
+  }).filter(p => p.objetivo);
+
+  const metaBlocks = document.querySelectorAll('[id^="meta-block-"]');
+  const metas = [...metaBlocks].map(b => {
+    const n = b.id.replace('meta-block-','');
+    return {
+      descricao: document.getElementById('meta-desc-'+n)?.value || '',
+      pct: document.getElementById('meta-pct-'+n)?.value || '0',
+      obs: document.getElementById('meta-obs-'+n)?.value || ''
+    };
+  }).filter(m => m.descricao);
+
+  const record = {
+    id: editingId || genId(),
+    colab: document.getElementById('mfbColab').value,
+    data: document.getElementById('mfbData').value,
+    anotacoes: document.getElementById('mfbAnotacoes').value,
+    fortes: document.getElementById('mfbFortes').value,
+    evolucao: document.getElementById('mfbEvolucao').value,
+    melhorar: document.getElementById('mfbMelhorar').value,
+    colab2: document.getElementById('mfbColab2').value,
+    passos: document.getElementById('mfbPassos').value,
+    outros: document.getElementById('mfbOutros').value,
+    conecta: document.getElementById('mfbConecta').value,
+    publico: document.getElementById('mfbPublico').value,
+    pdi, metas
+  };
+  if (!record.colab || !record.data) { toast('Preencha colaborador e data', 'error'); return; }
+  try {
+    await saveRecord('feedbacks', record);
+    if (editingId) {
+      const idx = STATE.feedbacks.findIndex(f => f.id === editingId);
+      if (idx >= 0) STATE.feedbacks[idx] = record;
+    } else {
+      STATE.feedbacks.push(record);
+    }
+    fbColabAtivo = record.colab;
+    closeModal('modalFB');
+    renderFBTabs();
+    toast('Feedback salvo!', 'success');
+  } catch(e) {}
+}
+
+async function deleteFeedback(id) {
+  if (!confirm('Excluir este ciclo de feedback?')) return;
+  try {
+    await deleteRecord('feedbacks', id);
+    STATE.feedbacks = STATE.feedbacks.filter(f => f.id !== id);
+    renderFBTabs();
+    toast('Ciclo excluído');
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════
+//  EXPORTAR FICHA
+// ═══════════════════════════════════════════════
+function openModalFicha() {
+  document.getElementById('fichaColab').value = fbColabAtivo || STATE.colaboradores[0];
+  previewFicha();
+  openModal('modalFicha');
+}
+
+function previewFicha() {
+  const colab = document.getElementById('fichaColab').value;
+  const ciclos = STATE.feedbacks.filter(f => f.colab === colab).sort((a,b) => b.data > a.data ? 1 : -1);
+  const allPDI = ciclos.flatMap(c => (c.pdi || []).map(p => ({...p, data: c.data})));
+  const allMetas = ciclos.flatMap(c => (c.metas || []).map(m => ({...m, data: c.data})));
+  const el = document.getElementById('fichaPreview');
+  el.innerHTML = `<div style="font-size:12px;color:var(--text-2)">
+    <b style="color:var(--navy)">${colab}</b> — ${ciclos.length} ciclo(s) · ${allPDI.length} objetivo(s) PDI · ${allMetas.length} meta(s)
+  </div>`;
+}
+
+function exportFicha() {
+  const colab = document.getElementById('fichaColab').value;
+  const ciclos = STATE.feedbacks.filter(f => f.colab === colab).sort((a,b) => b.data > a.data ? 1 : -1);
+  let txt = `FICHA DO COLABORADOR — ${colab}\nGerado em: ${new Date().toLocaleDateString('pt-BR')}\n\n`;
+  txt += '═'.repeat(60) + '\n';
+
+  ciclos.forEach(c => {
+    txt += `\n📅 CICLO: ${fmtDate(c.data)}\n${'─'.repeat(40)}\n`;
+    const campos = [
+      ['Anotações p/ próximo', c.anotacoes],
+      ['Pontos fortes', c.fortes],
+      ['Evolução', c.evolucao],
+      ['Pontos a melhorar', c.melhorar],
+      ['Levantados pelo colaborador', c.colab2],
+      ['Próximos passos', c.passos],
+      ['Outros recados', c.outros],
+      ['Resumo Conecta/Evolui', c.conecta],
+      ['Feedbacks públicos', c.publico]
+    ];
+    campos.forEach(([k,v]) => { if(v) txt += `\n[${k}]\n${v}\n`; });
+
+    if (c.pdi?.length) {
+      txt += `\n[PDI]\n`;
+      c.pdi.forEach((p,i) => {
+        txt += `  ${i+1}. ${p.objetivo}\n     Ações: ${p.acoes}\n     Prazo: ${fmtDate(p.prazo)} | Indicadores: ${p.indicadores}\n`;
+      });
+    }
+    if (c.metas?.length) {
+      txt += `\n[METAS]\n`;
+      c.metas.forEach((m,i) => {
+        txt += `  ${i+1}. ${m.descricao} — ${m.pct}%\n`;
+      });
+    }
+    txt += '\n';
+  });
+
+  const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Ficha_${colab.replace(/ /g,'_')}_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+  closeModal('modalFicha');
+  toast('Ficha exportada!', 'success');
+}
+
+// ═══════════════════════════════════════════════
+//  SIDE PANEL
+// ═══════════════════════════════════════════════
+function renderSidePanel(tab) {
+  const panel = document.getElementById('sidePanel');
+  // Attach side panel correctly inside content-wrap
+  const cw = document.querySelector('.content-wrap');
+  if (!cw) return;
+
+  if (['config','feedbacks'].includes(tab)) {
+    panel.style.display = 'none'; return;
+  }
+  panel.style.display = '';
+
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0,10);
+
+  if (tab === 'ferias') {
+    // Calendar + próximas férias
+    const calHtml = buildCalendar();
+    const proximas = STATE.ferias
+      .filter(f => f.retorno >= todayStr)
+      .sort((a,b) => a.inicio > b.inicio ? 1 : -1)
+      .slice(0, 8);
+
+    const thisMonthFerias = STATE.ferias.filter(f => {
+      const m = now.toISOString().slice(0,7);
+      return f.inicio?.startsWith(m) || f.retorno?.startsWith(m);
+    });
+
+    panel.innerHTML = `
+      <div class="panel-title">Calendário</div>
+      ${calHtml}
+      ${thisMonthFerias.length ? `<div class="highlight-today">🌴 <strong>${thisMonthFerias.length}</strong> pessoa(s) de férias este mês</div>` : ''}
+      <div class="panel-title" style="margin-top:16px">Próximas férias</div>
+      ${proximas.length ? proximas.map(f => `
+        <div class="panel-item">
+          <div class="panel-dot pd-teal"></div>
+          <div>
+            <div class="panel-item-name">${f.colab}</div>
+            <div class="panel-item-sub">${fmtDate(f.inicio)} → ${fmtDate(f.retorno)}<br><b>${f.dias} dias</b>${f.obs ? ' · ' + f.obs : ''}</div>
+          </div>
+        </div>`).join('') : '<p class="no-data">Sem próximas férias</p>'}`;
+
+  } else if (tab === 'banco') {
+    const positivos = STATE.bancoHoras.filter(b => b.saldo > 0);
+    const negativos = STATE.bancoHoras.filter(b => b.saldo < 0);
+    panel.innerHTML = `
+      <div class="panel-title">Resumo do time</div>
+      <div class="panel-item">
+        <div class="panel-dot pd-green"></div>
+        <div>
+          <div class="panel-item-name" style="color:var(--green)">Saldo positivo</div>
+          <div class="panel-item-sub">${positivos.length} colaborador(es)</div>
+        </div>
+      </div>
+      <div class="panel-item">
+        <div class="panel-dot pd-red"></div>
+        <div>
+          <div class="panel-item-name" style="color:var(--red)">Saldo negativo</div>
+          <div class="panel-item-sub">${negativos.length} colaborador(es)</div>
+        </div>
+      </div>
+      <div class="panel-title" style="margin-top:16px">Verificações recentes</div>
+      ${STATE.bancoHoras.sort((a,b) => b.dataVerif > a.dataVerif ? 1 : -1).slice(0,5).map(b => `
+        <div class="panel-item">
+          <div class="panel-dot ${b.saldo > 0 ? 'pd-green' : b.saldo < 0 ? 'pd-red' : 'pd-teal'}"></div>
+          <div>
+            <div class="panel-item-name">${b.colab}</div>
+            <div class="panel-item-sub">Verificado: ${fmtDate(b.dataVerif)}</div>
+          </div>
+          <div style="font-weight:700;font-size:13px;${b.saldo > 0 ? 'color:var(--green)' : b.saldo < 0 ? 'color:var(--red)' : 'color:var(--text-3)'};margin-left:auto">${b.saldo > 0 ? '+' : ''}${b.saldo}h</div>
+        </div>`).join('') || '<p class="no-data">Sem registros</p>'}`;
+
+  } else if (tab === 'homeoffice') {
+    const hoje = STATE.homeoffice.filter(h => h.data === todayStr);
+    const semana = STATE.homeoffice.filter(h => {
+      const d = new Date(h.data + 'T12:00');
+      const s = new Date(now); s.setDate(s.getDate() - s.getDay());
+      const e = new Date(s); e.setDate(s.getDate() + 6);
+      return d >= s && d <= e;
+    });
+    panel.innerHTML = `
+      <div class="panel-title">Hoje — ${fmtDate(todayStr)}</div>
+      ${hoje.length ? hoje.map(h => `
+        <div class="panel-item">
+          <div class="panel-dot ${h.tipo === 'Home Office' ? 'pd-teal' : 'pd-gold'}"></div>
+          <div>
+            <div class="panel-item-name">${h.colab}</div>
+            <div class="panel-item-sub">${h.tipo} · ${h.periodo}</div>
+          </div>
+        </div>`).join('') : '<p class="no-data" style="margin-bottom:12px">Todos presencialmente</p>'}
+      <div class="panel-title" style="margin-top:14px">Esta semana (${semana.length})</div>
+      ${semana.map(h => `
+        <div class="panel-item">
+          <div class="panel-dot ${h.tipo === 'Home Office' ? 'pd-teal' : 'pd-gold'}"></div>
+          <div>
+            <div class="panel-item-name">${h.colab}</div>
+            <div class="panel-item-sub">${fmtDate(h.data)} · ${h.tipo}</div>
+          </div>
+        </div>`).join('') || '<p class="no-data">Nenhum registro</p>'}`;
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  CALENDÁRIO
+// ═══════════════════════════════════════════════
+function buildCalendar() {
+  const y = calendarDate.getFullYear(), m = calendarDate.getMonth();
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const today = new Date().toISOString().slice(0,10);
+  const monthStr = `${y}-${String(m+1).padStart(2,'0')}`;
+
+  const feriasDoMes = STATE.ferias.filter(f =>
+    f.inicio?.slice(0,7) === monthStr || f.retorno?.slice(0,7) === monthStr ||
+    (f.inicio < monthStr + '-01' && f.retorno > monthStr + '-31')
+  );
+
+  const feriaDays = new Set();
+  feriasDoMes.forEach(f => {
+    let d = new Date(f.inicio + 'T12:00');
+    const end = new Date(f.retorno + 'T12:00');
+    while (d <= end) {
+      feriaDays.add(d.toISOString().slice(0,10));
+      d.setDate(d.getDate() + 1);
+    }
+  });
+
+  const dias = ['D','S','T','Q','Q','S','S'];
+  let html = `<div class="cal-nav">
+    <button class="cal-nav-btn" onclick="calNav(-1)">‹</button>
+    <span class="cal-nav-title">${new Date(y,m,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</span>
+    <button class="cal-nav-btn" onclick="calNav(1)">›</button>
+  </div>
+  <div class="cal-grid">
+    ${dias.map(d => `<div class="cal-hd">${d}</div>`).join('')}`;
+
+  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day other-month"></div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = ds === today;
+    const isFerias = feriaDays.has(ds);
+    html += `<div class="cal-day${isToday ? ' today' : ''}${isFerias ? ' ferias' : ''}">${d}</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function calNav(dir) {
+  calendarDate.setMonth(calendarDate.getMonth() + dir);
+  renderSidePanel('ferias');
+}
+
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+function avHtml(name, idx = null, size = 32) {
+  if (idx === null) idx = STATE.colaboradores.indexOf(name);
+  const initials = name.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase();
+  const cls = `av-${Math.abs(idx) % 6}`;
+  return `<div class="avatar ${cls}" style="${size !== 32 ? `width:${size}px;height:${size}px;font-size:${size*0.38}px` : ''}">${initials}</div>`;
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  try { return new Date(d + 'T12:00').toLocaleDateString('pt-BR'); } catch { return d; }
+}
+
+function today() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  editingId = null;
+}
+
+function setSyncStatus(msg, state = 'ok') {
+  document.getElementById('syncLabel').textContent = msg;
+  const dot = document.getElementById('syncDot');
+  dot.className = 'sync-dot' + (state === 'error' ? ' error' : state === 'loading' ? ' loading' : '');
+}
+
+function showLoading(show) {
+  document.getElementById('loadingOverlay').classList.toggle('show', show);
+}
+
+let toastTimer;
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = '', 3000);
+}
+
+// close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => {
+    if (e.target === o) o.classList.remove('open');
+  });
+});
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+loadConfig();
+repopulateSelects();
+renderAll();
+showTab('ferias');
+
+// auto-sync if configured
+if (STATE.scriptUrl) {
+  syncData();
+} else {
+  setSyncStatus('Configure a conexão', 'error');
+}
+</script>
+</body>
+</html>
