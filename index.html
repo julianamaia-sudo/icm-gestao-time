@@ -751,7 +751,7 @@
     </div>
   </div>
   <div class="sidebar-footer">
-    <div class="sync-status">
+    <div class="sync-status" onclick="if(!STATE.scriptUrl) showTab('config')" style="cursor:pointer" title="Clique para configurar">
       <div class="sync-dot loading" id="syncDot"></div>
       <span id="syncLabel">Conectando...</span>
     </div>
@@ -950,8 +950,16 @@
           <select id="mbColab"></select>
         </div>
         <div class="form-group">
-          <label>Saldo (horas, use - para negativo)</label>
-          <input type="number" id="mbSaldo" placeholder="Ex: 8 ou -3.5" step="0.5">
+          <label>Sinal</label>
+          <select id="mbSinal">
+            <option value="+">+ Positivo (horas a favor)</option>
+            <option value="-">− Negativo (horas devendo)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Saldo (HH:MM)</label>
+          <input type="text" id="mbSaldo" placeholder="Ex: 3:21 ou 10:00" pattern="^\d+:[0-5]\d$" inputmode="numeric">
+          <span style="font-size:11px;color:var(--text-3);margin-top:3px">Use o formato horas:minutos — ex: 3:21, 10:00, 0:45</span>
         </div>
         <div class="form-group">
           <label>Data de referência</label>
@@ -1477,13 +1485,15 @@ function openModalBH(id = null) {
     const r = STATE.bancoHoras.find(b => b.id === id);
     if (r) {
       document.getElementById('mbColab').value = r.colab;
-      document.getElementById('mbSaldo').value = r.saldo;
+      document.getElementById('mbSinal').value = r.saldo < 0 ? '-' : '+';
+      document.getElementById('mbSaldo').value = decimalToHHMM(Math.abs(r.saldo));
       document.getElementById('mbDataRef').value = r.dataRef || '';
       document.getElementById('mbDataVerif').value = r.dataVerif || '';
       document.getElementById('mbJustif').value = r.justif || '';
     }
   } else {
     document.getElementById('mbColab').value = STATE.colaboradores[0];
+    document.getElementById('mbSinal').value = '+';
     document.getElementById('mbSaldo').value = '';
     document.getElementById('mbDataRef').value = today();
     document.getElementById('mbDataVerif').value = today();
@@ -1493,10 +1503,18 @@ function openModalBH(id = null) {
 }
 
 async function saveBH() {
+  const raw = document.getElementById('mbSaldo').value.trim();
+  const sinal = document.getElementById('mbSinal').value;
+  const saldoDecimal = hhmmToDecimal(raw);
+  if (saldoDecimal === null) {
+    toast('Use o formato HH:MM — ex: 3:21 ou 10:00', 'error'); return;
+  }
+  const saldoFinal = sinal === '-' ? -saldoDecimal : saldoDecimal;
   const record = {
     id: editingId || genId(),
     colab: document.getElementById('mbColab').value,
-    saldo: parseFloat(document.getElementById('mbSaldo').value) || 0,
+    saldo: saldoFinal,
+    saldoDisplay: (sinal === '-' ? '-' : '+') + raw,
     dataRef: document.getElementById('mbDataRef').value,
     dataVerif: document.getElementById('mbDataVerif').value,
     justif: document.getElementById('mbJustif').value
@@ -1552,7 +1570,7 @@ function renderBH() {
       <button class="btn btn-ghost btn-sm" onclick="openModalBH()">+ Lançar</button>
     </div>`;
     const cls = r.saldo > 0 ? 'pos' : r.saldo < 0 ? 'neg' : 'zero';
-    const sign = r.saldo > 0 ? '+' : '';
+    const displayVal = r.saldoDisplay || ((r.saldo > 0 ? '+' : '') + decimalToHHMM(Math.abs(r.saldo)));
     return `<div class="bh-card">
       ${avHtml(c, i)}
       <div>
@@ -1560,7 +1578,7 @@ function renderBH() {
         <div class="bh-meta">Ref.: ${fmtDate(r.dataRef)} · Verificado: ${fmtDate(r.dataVerif)}</div>
         ${r.justif ? `<div class="bh-meta" style="margin-top:3px;max-width:360px">${r.justif}</div>` : ''}
       </div>
-      <div class="bh-saldo ${cls}">${sign}${r.saldo}h</div>
+      <div class="bh-saldo ${cls}">${displayVal}</div>
       <div class="row-actions">
         <button class="btn btn-ghost btn-sm btn-icon" onclick="openModalBH('${r.id}')">✏️</button>
         <button class="btn btn-danger btn-sm btn-icon" onclick="deleteBH('${r.id}')">🗑️</button>
@@ -2078,7 +2096,7 @@ function renderSidePanel(tab) {
             <div class="panel-item-name">${b.colab}</div>
             <div class="panel-item-sub">Verificado: ${fmtDate(b.dataVerif)}</div>
           </div>
-          <div style="font-weight:700;font-size:13px;${b.saldo > 0 ? 'color:var(--green)' : b.saldo < 0 ? 'color:var(--red)' : 'color:var(--text-3)'};margin-left:auto">${b.saldo > 0 ? '+' : ''}${b.saldo}h</div>
+          <div style="font-weight:700;font-size:13px;${b.saldo > 0 ? 'color:var(--green)' : b.saldo < 0 ? 'color:var(--red)' : 'color:var(--text-3)'};margin-left:auto">${b.saldoDisplay || ((b.saldo > 0 ? '+' : '') + decimalToHHMM(Math.abs(b.saldo)))}</div>
         </div>`).join('') || '<p class="no-data">Sem registros</p>'}`;
 
   } else if (tab === 'homeoffice') {
@@ -2159,6 +2177,28 @@ function buildCalendar() {
 function calNav(dir) {
   calendarDate.setMonth(calendarDate.getMonth() + dir);
   renderSidePanel('ferias');
+}
+
+// ═══════════════════════════════════════════════
+//  CONVERSÃO HH:MM ↔ DECIMAL
+// ═══════════════════════════════════════════════
+function hhmmToDecimal(str) {
+  if (!str) return null;
+  str = str.trim().replace(',', ':');
+  const parts = str.split(':');
+  if (parts.length !== 2) return null;
+  const h = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+  if (isNaN(h) || isNaN(m) || m < 0 || m > 59) return null;
+  return Math.round((h + m / 60) * 100) / 100;
+}
+
+function decimalToHHMM(decimal) {
+  if (decimal === undefined || decimal === null || isNaN(decimal)) return '0:00';
+  const abs = Math.abs(decimal);
+  const h = Math.floor(abs);
+  const m = Math.round((abs - h) * 60);
+  return `${h}:${String(m).padStart(2, '0')}`;
 }
 
 // ═══════════════════════════════════════════════
