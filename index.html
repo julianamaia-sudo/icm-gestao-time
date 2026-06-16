@@ -244,7 +244,76 @@
     box-shadow: 0 0 0 3px rgba(44,191,173,0.12);
     background: #fff;
   }
-  textarea { resize: vertical; min-height: 72px; }
+  textarea { resize: vertical; min-height: 120px; }
+
+  /* ── RICH EDITOR ── */
+  .rich-wrap { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+  .rich-wrap:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(44,191,173,0.12); }
+  .rich-toolbar {
+    display: flex; gap: 2px; padding: 5px 8px;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+  }
+  .rich-btn {
+    background: none; border: 1px solid transparent; border-radius: 4px;
+    padding: 3px 7px; cursor: pointer; font-size: 13px;
+    color: var(--text-2); font-family: inherit; line-height: 1.4;
+    transition: all .12s;
+  }
+  .rich-btn:hover { background: var(--teal-light); border-color: var(--teal-mid); color: var(--navy); }
+  .rich-btn b { font-weight: 800; }
+  .rich-editor {
+    min-height: 120px; padding: 10px 12px;
+    font-family: inherit; font-size: 13px; color: var(--text);
+    background: var(--bg); outline: none; line-height: 1.7;
+    white-space: pre-wrap; overflow-y: auto;
+  }
+  .rich-editor:focus { background: #fff; }
+  .rich-editor:empty:before {
+    content: attr(data-placeholder);
+    color: var(--text-3);
+    pointer-events: none;
+  }
+  .rich-editor ul { margin: 4px 0 4px 20px; padding: 0; }
+  .rich-editor li { margin-bottom: 2px; }
+
+  /* ── CONECTA TAB ── */
+  .conecta-cols { display: grid; grid-template-columns: 240px 1fr; gap: 0; flex: 1; }
+  .conecta-sidebar {
+    border-right: 1px solid var(--border);
+    padding: 16px 12px;
+    background: var(--bg);
+  }
+  .conecta-content { padding: 24px; overflow-y: auto; }
+  .colab-nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: var(--radius-sm);
+    cursor: pointer; transition: all .15s; margin-bottom: 4px;
+    user-select: none;
+  }
+  .colab-nav-item:hover { background: var(--teal-light); }
+  .colab-nav-item.active { background: var(--navy); color: #fff; }
+  .colab-nav-item.active .colab-nav-name { color: #fff; }
+  .colab-nav-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .colab-nav-count {
+    margin-left: auto; font-size: 10px; font-weight: 700;
+    background: var(--teal); color: #fff;
+    border-radius: 10px; padding: 1px 7px;
+  }
+  .colab-nav-item.active .colab-nav-count { background: rgba(255,255,255,0.25); }
+  .conecta-item {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface); margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .conecta-item-hd {
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--teal-light); border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .conecta-item-date { font-size: 12px; font-weight: 700; color: var(--navy); }
+  .conecta-item-body { padding: 14px 16px; font-size: 13px; color: var(--text); line-height: 1.7; }
+  .conecta-item-body ul { margin: 4px 0 4px 20px; }
+  .conecta-item-body li { margin-bottom: 3px; }
 
   /* ── TABLE ── */
   .table-wrap { overflow-x: auto; border-radius: var(--radius); }
@@ -743,6 +812,9 @@
     <div class="nav-item" onclick="showTab('feedbacks')">
       <span class="icon">💬</span><span>Feedbacks & PDI</span>
     </div>
+    <div class="nav-item" onclick="showTab('conecta')">
+      <span class="icon">⭐</span><span>Feedbacks Conecta</span>
+    </div>
   </div>
   <div class="nav-section">
     <div class="nav-label">Sistema</div>
@@ -887,6 +959,19 @@
     </div>
 
   </div><!-- end content-wrap without side panels on feedback/config -->
+
+  <!-- ═══ CONECTA ═══ -->
+  <div class="tab-page" id="tab-conecta" style="flex:1;flex-direction:column;padding:0;margin-left:0">
+    <div class="conecta-cols" style="flex:1;min-height:calc(100vh - 60px)">
+      <div class="conecta-sidebar">
+        <div class="panel-title" style="margin-bottom:12px">Colaboradores</div>
+        <div id="conectaNavList"></div>
+      </div>
+      <div class="conecta-content" id="conectaContent">
+        <div class="empty-state"><div class="big">⭐</div><p>Selecione um colaborador ao lado</p></div>
+      </div>
+    </div>
+  </div>
 
   <!-- SIDE PANELS (rendered per tab) -->
   <div class="side-panel" id="sidePanel" style="display:none"></div>
@@ -1050,39 +1135,91 @@
       <div class="form-grid">
         <div class="fb-form-section">
           <div class="fb-form-section-title">📌 Anotações para próximo feedback</div>
-          <textarea id="mfbAnotacoes" placeholder="Pontos a abordar no próximo ciclo..."></textarea>
+          <div class="rich-wrap">
+            <div class="rich-toolbar">
+              <button type="button" class="rich-btn" onclick="rfmt('mfbAnotacoes','bold')" title="Negrito"><b>N</b></button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbAnotacoes','ul')" title="Lista">☰</button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbAnotacoes','clear')" title="Limpar formatação">✕</button>
+            </div>
+            <div class="rich-editor" id="mfbAnotacoes" contenteditable="true" data-placeholder="Pontos a abordar no próximo ciclo..."></div>
+          </div>
         </div>
         <div class="fb-form-section">
           <div class="fb-form-section-title">✅ Pontos fortes</div>
-          <textarea id="mfbFortes" placeholder="O que o colaborador tem se destacado..."></textarea>
+          <div class="rich-wrap">
+            <div class="rich-toolbar">
+              <button type="button" class="rich-btn" onclick="rfmt('mfbFortes','bold')" title="Negrito"><b>N</b></button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbFortes','ul')" title="Lista">☰</button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbFortes','clear')" title="Limpar formatação">✕</button>
+            </div>
+            <div class="rich-editor" id="mfbFortes" contenteditable="true" data-placeholder="O que o colaborador tem se destacado..."></div>
+          </div>
         </div>
         <div class="fb-form-section">
           <div class="fb-form-section-title">📈 Evolução</div>
-          <textarea id="mfbEvolucao" placeholder="O que melhorou desde o último ciclo..."></textarea>
+          <div class="rich-wrap">
+            <div class="rich-toolbar">
+              <button type="button" class="rich-btn" onclick="rfmt('mfbEvolucao','bold')" title="Negrito"><b>N</b></button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbEvolucao','ul')" title="Lista">☰</button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbEvolucao','clear')" title="Limpar formatação">✕</button>
+            </div>
+            <div class="rich-editor" id="mfbEvolucao" contenteditable="true" data-placeholder="O que melhorou desde o último ciclo..."></div>
+          </div>
         </div>
         <div class="fb-form-section">
           <div class="fb-form-section-title">⚠️ Pontos a melhorar</div>
-          <textarea id="mfbMelhorar" placeholder="Comportamentos ou entregas a desenvolver..."></textarea>
+          <div class="rich-wrap">
+            <div class="rich-toolbar">
+              <button type="button" class="rich-btn" onclick="rfmt('mfbMelhorar','bold')" title="Negrito"><b>N</b></button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbMelhorar','ul')" title="Lista">☰</button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbMelhorar','clear')" title="Limpar formatação">✕</button>
+            </div>
+            <div class="rich-editor" id="mfbMelhorar" contenteditable="true" data-placeholder="Comportamentos ou entregas a desenvolver..."></div>
+          </div>
         </div>
         <div class="fb-form-section">
           <div class="fb-form-section-title">💬 Pontos levantados pelo colaborador</div>
-          <textarea id="mfbColab2" placeholder="O que o colaborador trouxe na conversa..."></textarea>
+          <div class="rich-wrap">
+            <div class="rich-toolbar">
+              <button type="button" class="rich-btn" onclick="rfmt('mfbColab2','bold')" title="Negrito"><b>N</b></button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbColab2','ul')" title="Lista">☰</button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbColab2','clear')" title="Limpar formatação">✕</button>
+            </div>
+            <div class="rich-editor" id="mfbColab2" contenteditable="true" data-placeholder="O que o colaborador trouxe na conversa..."></div>
+          </div>
         </div>
         <div class="fb-form-section">
           <div class="fb-form-section-title">🎯 Próximos passos</div>
-          <textarea id="mfbPassos" placeholder="Acordos e comprometimentos..."></textarea>
+          <div class="rich-wrap">
+            <div class="rich-toolbar">
+              <button type="button" class="rich-btn" onclick="rfmt('mfbPassos','bold')" title="Negrito"><b>N</b></button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbPassos','ul')" title="Lista">☰</button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbPassos','clear')" title="Limpar formatação">✕</button>
+            </div>
+            <div class="rich-editor" id="mfbPassos" contenteditable="true" data-placeholder="Acordos e comprometimentos..."></div>
+          </div>
         </div>
         <div class="fb-form-section">
           <div class="fb-form-section-title">📣 Outros recados</div>
-          <textarea id="mfbOutros" placeholder="Informações adicionais..."></textarea>
+          <div class="rich-wrap">
+            <div class="rich-toolbar">
+              <button type="button" class="rich-btn" onclick="rfmt('mfbOutros','bold')" title="Negrito"><b>N</b></button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbOutros','ul')" title="Lista">☰</button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbOutros','clear')" title="Limpar formatação">✕</button>
+            </div>
+            <div class="rich-editor" id="mfbOutros" contenteditable="true" data-placeholder="Informações adicionais..."></div>
+          </div>
         </div>
         <div class="fb-form-section">
           <div class="fb-form-section-title">📋 Resumo Feedback Conecta/Evolui</div>
-          <textarea id="mfbConecta" placeholder="Resumo para o sistema oficial..."></textarea>
-        </div>
-        <div class="fb-form-section">
-          <div class="fb-form-section-title">👏 Feedbacks públicos (Conecta)</div>
-          <textarea id="mfbPublico" placeholder="Reconhecimentos públicos registrados..."></textarea>
+          <div class="rich-wrap">
+            <div class="rich-toolbar">
+              <button type="button" class="rich-btn" onclick="rfmt('mfbConecta','bold')" title="Negrito"><b>N</b></button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbConecta','ul')" title="Lista">☰</button>
+              <button type="button" class="rich-btn" onclick="rfmt('mfbConecta','clear')" title="Limpar formatação">✕</button>
+            </div>
+            <div class="rich-editor" id="mfbConecta" contenteditable="true" data-placeholder="Resumo para o sistema oficial..."></div>
+          </div>
         </div>
       </div>
       <hr class="divider">
@@ -1122,6 +1259,42 @@
   </div>
 </div>
 
+<!-- Modal Conecta -->
+<div class="modal-overlay" id="modalConecta">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⭐ Feedback Conecta</div>
+      <button class="close-btn" onclick="closeModal('modalConecta')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid form-grid-2" style="margin-bottom:16px">
+        <div class="form-group">
+          <label>Colaborador</label>
+          <select id="mCtColab"></select>
+        </div>
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" id="mCtData">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Conteúdo do feedback público</label>
+        <div class="rich-wrap">
+          <div class="rich-toolbar">
+            <button type="button" class="rich-btn" onclick="rfmt('mCtConteudo','bold')"><b>N</b></button>
+            <button type="button" class="rich-btn" onclick="rfmt('mCtConteudo','ul')">☰</button>
+          </div>
+          <div class="rich-editor" id="mCtConteudo" contenteditable="true" style="min-height:180px" data-placeholder="Descreva o feedback público registrado no Conecta..."></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalConecta')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveConecta()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Loading -->
 <div class="loading-overlay" id="loadingOverlay">
   <div class="spinner"></div>
@@ -1141,6 +1314,7 @@ let STATE = {
   bancoHoras: [],
   homeoffice: [],
   feedbacks: [],
+  conecta: [],
   scriptUrl: '',
   secretKey: ''
 };
@@ -1241,6 +1415,7 @@ async function syncData() {
     if (data.bancoHoras) STATE.bancoHoras = data.bancoHoras;
     if (data.homeoffice) STATE.homeoffice = data.homeoffice;
     if (data.feedbacks) STATE.feedbacks = data.feedbacks;
+    if (data.conecta) STATE.conecta = data.conecta;
     setSyncStatus('Sincronizado', 'ok');
     renderAll();
     toast('Dados sincronizados!', 'success');
@@ -1300,6 +1475,7 @@ const tabTitles = {
   banco: '⏱️ Banco de Horas',
   homeoffice: '🏠 Home Office & Ausências',
   feedbacks: '💬 Feedbacks & PDI',
+  conecta: '⭐ Feedbacks Conecta',
   config: '⚙️ Configurações'
 };
 
@@ -1308,6 +1484,7 @@ const topActions = {
   banco: 'openModalBH',
   homeoffice: 'openModalHO',
   feedbacks: 'openModalFB',
+  conecta: 'openModalConecta',
   config: null
 };
 
@@ -1323,13 +1500,14 @@ function showTab(tab) {
   const btn = document.getElementById('btnTopAction');
   if (topActions[tab]) {
     btn.style.display = '';
-    btn.textContent = tab === 'feedbacks' ? '+ Novo Ciclo' :
+    btn.textContent = tab === 'feedbacks' ? '+ Novo Ciclo' : tab === 'conecta' ? '+ Registrar Feedback' :
                       tab === 'banco' ? '+ Atualizar Saldo' : '+ Registrar';
   } else {
     btn.style.display = 'none';
   }
   renderSidePanel(tab);
   if (tab === 'feedbacks') renderFBTabs();
+  if (tab === 'conecta') renderConecta();
 }
 
 function openTopAction() {
@@ -1337,7 +1515,8 @@ function openTopAction() {
     ferias: openModalFerias,
     banco: openModalBH,
     homeoffice: openModalHO,
-    feedbacks: openModalFB
+    feedbacks: openModalFB,
+    conecta: openModalConecta
   };
   if (actions[currentTab]) actions[currentTab]();
 }
@@ -1355,7 +1534,7 @@ function renderAll() {
 }
 
 function repopulateSelects() {
-  const selIds = ['mfColab','mbColab','mhColab','mfbColab',
+  const selIds = ['mfColab','mbColab','mhColab','mfbColab','mCtColab',
                   'feriasFiltroColab','hoFiltroColab','fichaColab'];
   selIds.forEach(id => {
     const el = document.getElementById(id);
@@ -1740,7 +1919,6 @@ function renderCiclo(c) {
     { key:'passos',    label:'🎯 Próximos passos' },
     { key:'outros',    label:'📣 Outros recados' },
     { key:'conecta',   label:'📋 Resumo Conecta/Evolui' },
-    { key:'publico',   label:'👏 Feedbacks públicos' }
   ];
 
   let body = fields.map(f => `
@@ -1804,8 +1982,8 @@ function openModalFB(colab = null) {
   document.getElementById('mFBTitle').textContent = 'Novo Ciclo de Feedback';
   document.getElementById('mfbColab').value = colab || fbColabAtivo || STATE.colaboradores[0];
   document.getElementById('mfbData').value = today();
-  ['Anotacoes','Fortes','Evolucao','Melhorar','Colab2','Passos','Outros','Conecta','Publico']
-    .forEach(k => document.getElementById('mfb'+k).value = '');
+  ['Anotacoes','Fortes','Evolucao','Melhorar','Colab2','Passos','Outros','Conecta']
+    .forEach(k => setRich('mfb'+k, ''));
   document.getElementById('pdiFormList').innerHTML = '';
   document.getElementById('metasFormList').innerHTML = '';
   openModal('modalFB');
@@ -1818,15 +1996,14 @@ function editFeedback(id) {
   document.getElementById('mFBTitle').textContent = 'Editar Feedback — ' + fmtDate(c.data);
   document.getElementById('mfbColab').value = c.colab;
   document.getElementById('mfbData').value = c.data;
-  document.getElementById('mfbAnotacoes').value = c.anotacoes || '';
-  document.getElementById('mfbFortes').value = c.fortes || '';
-  document.getElementById('mfbEvolucao').value = c.evolucao || '';
-  document.getElementById('mfbMelhorar').value = c.melhorar || '';
-  document.getElementById('mfbColab2').value = c.colab2 || '';
-  document.getElementById('mfbPassos').value = c.passos || '';
-  document.getElementById('mfbOutros').value = c.outros || '';
-  document.getElementById('mfbConecta').value = c.conecta || '';
-  document.getElementById('mfbPublico').value = c.publico || '';
+  setRich('mfbAnotacoes', c.anotacoes || '');
+  setRich('mfbFortes', c.fortes || '');
+  setRich('mfbEvolucao', c.evolucao || '');
+  setRich('mfbMelhorar', c.melhorar || '');
+  setRich('mfbColab2', c.colab2 || '');
+  setRich('mfbPassos', c.passos || '');
+  setRich('mfbOutros', c.outros || '');
+  setRich('mfbConecta', c.conecta || '');
   // PDI
   document.getElementById('pdiFormList').innerHTML = '';
   (c.pdi || []).forEach(p => addPDIForm(p));
@@ -1921,15 +2098,14 @@ async function saveFeedback() {
     id: editingId || genId(),
     colab: document.getElementById('mfbColab').value,
     data: document.getElementById('mfbData').value,
-    anotacoes: document.getElementById('mfbAnotacoes').value,
-    fortes: document.getElementById('mfbFortes').value,
-    evolucao: document.getElementById('mfbEvolucao').value,
-    melhorar: document.getElementById('mfbMelhorar').value,
-    colab2: document.getElementById('mfbColab2').value,
-    passos: document.getElementById('mfbPassos').value,
-    outros: document.getElementById('mfbOutros').value,
-    conecta: document.getElementById('mfbConecta').value,
-    publico: document.getElementById('mfbPublico').value,
+    anotacoes: getRich('mfbAnotacoes'),
+    fortes: getRich('mfbFortes'),
+    evolucao: getRich('mfbEvolucao'),
+    melhorar: getRich('mfbMelhorar'),
+    colab2: getRich('mfbColab2'),
+    passos: getRich('mfbPassos'),
+    outros: getRich('mfbOutros'),
+    conecta: getRich('mfbConecta'),
     pdi, metas
   };
   if (!record.colab || !record.data) { toast('Preencha colaborador e data', 'error'); return; }
@@ -2034,7 +2210,7 @@ function renderSidePanel(tab) {
   const cw = document.querySelector('.content-wrap');
   if (!cw) return;
 
-  if (['config','feedbacks'].includes(tab)) {
+  if (['config','feedbacks','conecta'].includes(tab)) {
     panel.style.display = 'none'; return;
   }
   panel.style.display = '';
@@ -2269,6 +2445,155 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
 });
 
 // ═══════════════════════════════════════════════
+//  RICH EDITOR
+// ═══════════════════════════════════════════════
+function rfmt(id, cmd) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.focus();
+  if (cmd === 'bold') {
+    document.execCommand('bold', false, null);
+  } else if (cmd === 'ul') {
+    document.execCommand('insertUnorderedList', false, null);
+  } else if (cmd === 'clear') {
+    document.execCommand('removeFormat', false, null);
+    document.execCommand('insertUnorderedList', false, null); // toggle off if active
+  }
+}
+
+function getRich(id) {
+  const el = document.getElementById(id);
+  return el ? el.innerHTML : '';
+}
+
+function setRich(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html || '';
+}
+
+// placeholder visual nos rich editors
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.rich-editor[data-placeholder]').forEach(el => {
+    el.addEventListener('focus', () => el.classList.add('focused'));
+    el.addEventListener('blur', () => el.classList.remove('focused'));
+  });
+});
+
+// ═══════════════════════════════════════════════
+//  FEEDBACKS CONECTA
+// ═══════════════════════════════════════════════
+let conectaColabAtivo = null;
+
+function renderConecta() {
+  const nav = document.getElementById('conectaNavList');
+  if (!nav) return;
+  if (!conectaColabAtivo) conectaColabAtivo = STATE.colaboradores[0];
+  nav.innerHTML = STATE.colaboradores.map(c => {
+    const qty = (STATE.conecta || []).filter(r => r.colab === c).length;
+    const avIdx = STATE.colaboradores.indexOf(c);
+    return `<div class="colab-nav-item ${c === conectaColabAtivo ? 'active' : ''}" onclick="selectConecta('${c}')">
+      ${avHtml(c, avIdx, 28)}
+      <span class="colab-nav-name">${c}</span>
+      ${qty ? `<span class="colab-nav-count">${qty}</span>` : ''}
+    </div>`;
+  }).join('');
+  renderConectaContent(conectaColabAtivo);
+}
+
+function selectConecta(c) {
+  conectaColabAtivo = c;
+  renderConecta();
+}
+
+function renderConectaContent(colab) {
+  const el = document.getElementById('conectaContent');
+  if (!el) return;
+  const registros = (STATE.conecta || [])
+    .filter(r => r.colab === colab)
+    .sort((a,b) => b.data > a.data ? 1 : -1);
+
+  const avIdx = STATE.colaboradores.indexOf(colab);
+  let html = `<div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--teal-light)">
+    ${avHtml(colab, avIdx, 44)}
+    <div>
+      <div style="font-size:16px;font-weight:700;color:var(--navy)">${colab}</div>
+      <div style="font-size:12px;color:var(--text-3)">${registros.length} feedback(s) Conecta registrado(s)</div>
+    </div>
+    <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openModalConecta('${colab}')">+ Registrar Feedback</button>
+  </div>`;
+
+  if (!registros.length) {
+    html += `<div class="empty-state"><div class="big">⭐</div><p>Nenhum feedback Conecta registrado para ${colab} ainda.</p></div>`;
+  } else {
+    registros.forEach(r => {
+      html += `<div class="conecta-item">
+        <div class="conecta-item-hd">
+          <span class="conecta-item-date">⭐ ${fmtDate(r.data)}</span>
+          <div class="row-actions">
+            <button class="btn btn-ghost btn-sm btn-icon" onclick="editConecta('${r.id}')">✏️</button>
+            <button class="btn btn-danger btn-sm btn-icon" onclick="deleteConecta('${r.id}')">🗑️</button>
+          </div>
+        </div>
+        <div class="conecta-item-body">${r.conteudo || '—'}</div>
+      </div>`;
+    });
+  }
+  el.innerHTML = html;
+}
+
+function openModalConecta(colab = null) {
+  editingId = null;
+  document.getElementById('mCtData').value = today();
+  document.getElementById('mCtColab').value = colab || conectaColabAtivo || STATE.colaboradores[0];
+  setRich('mCtConteudo', '');
+  openModal('modalConecta');
+}
+
+function editConecta(id) {
+  const r = (STATE.conecta || []).find(c => c.id === id);
+  if (!r) return;
+  editingId = id;
+  document.getElementById('mCtData').value = r.data;
+  document.getElementById('mCtColab').value = r.colab;
+  setRich('mCtConteudo', r.conteudo || '');
+  openModal('modalConecta');
+}
+
+async function saveConecta() {
+  const record = {
+    id: editingId || genId(),
+    colab: document.getElementById('mCtColab').value,
+    data: document.getElementById('mCtData').value || today(),
+    conteudo: getRich('mCtConteudo')
+  };
+  if (!record.colab) { toast('Selecione o colaborador', 'error'); return; }
+  try {
+    await saveRecord('conecta', record);
+    if (!STATE.conecta) STATE.conecta = [];
+    if (editingId) {
+      const idx = STATE.conecta.findIndex(c => c.id === editingId);
+      if (idx >= 0) STATE.conecta[idx] = record;
+    } else {
+      STATE.conecta.push(record);
+    }
+    conectaColabAtivo = record.colab;
+    closeModal('modalConecta');
+    renderConecta();
+    toast('Feedback Conecta salvo!', 'success');
+  } catch(e) {}
+}
+
+async function deleteConecta(id) {
+  if (!confirm('Excluir este feedback?')) return;
+  try {
+    await deleteRecord('conecta', id);
+    STATE.conecta = (STATE.conecta || []).filter(c => c.id !== id);
+    renderConecta();
+    toast('Feedback excluído');
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════
 loadConfig();
@@ -2285,3 +2610,4 @@ if (STATE.scriptUrl) {
 </script>
 </body>
 </html>
+
