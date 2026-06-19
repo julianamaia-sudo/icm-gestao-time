@@ -1562,23 +1562,25 @@ function repopulateSelects() {
 function openModalFerias(id = null) {
   editingId = id;
   document.getElementById('mFeriasTitle').textContent = id ? 'Editar Férias' : 'Registrar Férias';
-  if (id) {
-    const r = STATE.ferias.find(f => f.id === id);
-    if (r) {
-      document.getElementById('mfColab').value = r.colab;
-      document.getElementById('mfInicio').value = r.inicio;
-      document.getElementById('mfRetorno').value = r.retorno;
-      document.getElementById('mfDias').value = r.dias;
-      document.getElementById('mfObs').value = r.obs || '';
-    }
-  } else {
-    document.getElementById('mfColab').value = STATE.colaboradores[0];
-    document.getElementById('mfInicio').value = '';
-    document.getElementById('mfRetorno').value = '';
-    document.getElementById('mfDias').value = '';
-    document.getElementById('mfObs').value = '';
-  }
   openModal('modalFerias');
+  setTimeout(() => {
+    if (id) {
+      const r = STATE.ferias.find(f => f.id === id);
+      if (r) {
+        document.getElementById('mfColab').value = r.colab;
+        document.getElementById('mfInicio').value = r.inicio;
+        document.getElementById('mfRetorno').value = r.retorno;
+        document.getElementById('mfDias').value = r.dias;
+        document.getElementById('mfObs').value = r.obs || '';
+      }
+    } else {
+      document.getElementById('mfColab').value = STATE.colaboradores[0];
+      document.getElementById('mfInicio').value = '';
+      document.getElementById('mfRetorno').value = '';
+      document.getElementById('mfDias').value = '';
+      document.getElementById('mfObs').value = '';
+    }
+  }, 0);
 }
 
 function calcDias() {
@@ -1660,25 +1662,28 @@ function renderFerias() {
 function openModalBH(id = null) {
   editingId = id;
   document.getElementById('mBHTitle').textContent = id ? 'Editar Saldo' : 'Atualizar Banco de Horas';
-  if (id) {
-    const r = STATE.bancoHoras.find(b => b.id === id);
-    if (r) {
-      document.getElementById('mbColab').value = r.colab;
-      document.getElementById('mbSinal').value = r.saldo < 0 ? '-' : '+';
-      document.getElementById('mbSaldo').value = decimalToHHMM(Math.abs(r.saldo));
-      document.getElementById('mbDataRef').value = r.dataRef || '';
-      document.getElementById('mbDataVerif').value = r.dataVerif || '';
-      document.getElementById('mbJustif').value = r.justif || '';
-    }
-  } else {
-    document.getElementById('mbColab').value = STATE.colaboradores[0];
-    document.getElementById('mbSinal').value = '+';
-    document.getElementById('mbSaldo').value = '';
-    document.getElementById('mbDataRef').value = today();
-    document.getElementById('mbDataVerif').value = today();
-    document.getElementById('mbJustif').value = '';
-  }
   openModal('modalBH');
+  // seta valores APÓS abrir para garantir que o select já foi populado
+  setTimeout(() => {
+    if (id) {
+      const r = STATE.bancoHoras.find(b => b.id === id);
+      if (r) {
+        document.getElementById('mbColab').value = r.colab;
+        document.getElementById('mbSinal').value = r.saldo < 0 ? '-' : '+';
+        document.getElementById('mbSaldo').value = decimalToHHMM(Math.abs(r.saldo));
+        document.getElementById('mbDataRef').value = r.dataRef || '';
+        document.getElementById('mbDataVerif').value = r.dataVerif || '';
+        document.getElementById('mbJustif').value = r.justif || '';
+      }
+    } else {
+      document.getElementById('mbColab').value = STATE.colaboradores[0];
+      document.getElementById('mbSinal').value = '+';
+      document.getElementById('mbSaldo').value = '';
+      document.getElementById('mbDataRef').value = today();
+      document.getElementById('mbDataVerif').value = today();
+      document.getElementById('mbJustif').value = '';
+    }
+  }, 0);
 }
 
 async function saveBH() {
@@ -1771,23 +1776,25 @@ function renderBH() {
 // ═══════════════════════════════════════════════
 function openModalHO(id = null) {
   editingId = id;
-  if (id) {
-    const r = STATE.homeoffice.find(h => h.id === id);
-    if (r) {
-      document.getElementById('mhColab').value = r.colab;
-      document.getElementById('mhData').value = r.data;
-      document.getElementById('mhTipo').value = r.tipo;
-      document.getElementById('mhPeriodo').value = r.periodo;
-      document.getElementById('mhMotivo').value = r.motivo || '';
-    }
-  } else {
-    document.getElementById('mhColab').value = STATE.colaboradores[0];
-    document.getElementById('mhData').value = today();
-    document.getElementById('mhTipo').value = 'Home Office';
-    document.getElementById('mhPeriodo').value = 'Dia inteiro';
-    document.getElementById('mhMotivo').value = '';
-  }
   openModal('modalHO');
+  setTimeout(() => {
+    if (id) {
+      const r = STATE.homeoffice.find(h => h.id === id);
+      if (r) {
+        document.getElementById('mhColab').value = r.colab;
+        document.getElementById('mhData').value = r.data;
+        document.getElementById('mhTipo').value = r.tipo;
+        document.getElementById('mhPeriodo').value = r.periodo;
+        document.getElementById('mhMotivo').value = r.motivo || '';
+      }
+    } else {
+      document.getElementById('mhColab').value = STATE.colaboradores[0];
+      document.getElementById('mhData').value = today();
+      document.getElementById('mhTipo').value = 'Home Office';
+      document.getElementById('mhPeriodo').value = 'Dia inteiro';
+      document.getElementById('mhMotivo').value = '';
+    }
+  }, 0);
 }
 
 async function saveHO() {
@@ -2610,4 +2617,3 @@ if (STATE.scriptUrl) {
 </script>
 </body>
 </html>
-
