@@ -971,6 +971,137 @@
   .stat-bar-fill { height: 100%; border-radius: 3px; }
   .stat-bar-count { min-width: 24px; text-align: right; font-weight: 700; color: var(--navy); }
 
+  /* ── MODAL CARD DETALHE ── */
+  .card-detail-section { margin-bottom: 18px; }
+  .card-detail-label {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .8px;
+    text-transform: uppercase; color: var(--teal); margin-bottom: 6px;
+  }
+  .card-detail-value { font-size: 13px; color: var(--text); line-height: 1.6; }
+  .card-checklist-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 5px 0; font-size: 12.5px; color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  .card-checklist-item:last-child { border-bottom: none; }
+  .card-checklist-item.done { color: var(--text-3); text-decoration: line-through; }
+  .card-comment {
+    padding: 10px 12px; background: var(--bg);
+    border-radius: var(--radius-sm); margin-bottom: 8px;
+    font-size: 12.5px; line-height: 1.5;
+  }
+  .card-comment-author { font-weight: 700; color: var(--navy); margin-bottom: 3px; font-size: 11.5px; }
+
+  /* ── CARDS AGRUPAMENTO ── */
+  .cards-group { margin-bottom: 24px; }
+  .cards-group-hd {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; background: var(--navy);
+    border-radius: var(--radius-sm); margin-bottom: 10px;
+    cursor: pointer; user-select: none;
+  }
+  .cards-group-name { font-size: 14px; font-weight: 700; color: #fff; flex: 1; }
+  .cards-group-count {
+    background: var(--teal); color: #fff;
+    border-radius: 10px; padding: 2px 8px; font-size: 11px; font-weight: 700;
+  }
+  .cards-group-toggle { color: rgba(255,255,255,.5); font-size: 12px; }
+
+  /* ── BUSCA GLOBAL ── */
+  .global-search-wrap {
+    position: fixed; inset: 0; background: rgba(15,30,50,.6);
+    z-index: 400; display: flex; align-items: flex-start;
+    justify-content: center; padding-top: 80px;
+  }
+  .global-search-box {
+    background: #fff; border-radius: 16px;
+    box-shadow: var(--shadow-lg); width: 640px; max-width: 95vw;
+    overflow: hidden;
+  }
+  .global-search-input-wrap {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+  }
+  .global-search-input-wrap input {
+    flex: 1; border: none; font-size: 16px; font-family: inherit;
+    color: var(--text); background: transparent; outline: none;
+  }
+  .global-search-input-wrap .search-icon { font-size: 20px; color: var(--text-3); }
+  .global-search-input-wrap .close-global { cursor: pointer; font-size: 20px; color: var(--text-3); }
+  .global-results { max-height: 420px; overflow-y: auto; }
+  .global-section-label {
+    padding: 8px 20px 4px; font-size: 10.5px; font-weight: 700;
+    letter-spacing: .8px; text-transform: uppercase;
+    color: var(--text-3); background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+  }
+  .global-result-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 20px; cursor: pointer; transition: background .1s;
+    border-bottom: 1px solid var(--border);
+  }
+  .global-result-item:hover { background: var(--teal-light); }
+  .global-result-icon { font-size: 16px; flex-shrink: 0; }
+  .global-result-title { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .global-result-sub { font-size: 11.5px; color: var(--text-3); margin-top: 1px; }
+  .global-no-results { padding: 32px; text-align: center; color: var(--text-3); font-size: 13.5px; }
+
+  /* ── AGENDA SEMANA ── */
+  .agenda-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 1100px) { .agenda-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 750px) { .agenda-grid { grid-template-columns: 1fr 1fr; } }
+  .agenda-day {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .agenda-day.today { border-color: var(--teal); box-shadow: 0 0 0 2px rgba(44,191,173,.2); }
+  .agenda-day-hd {
+    padding: 10px 14px; border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .agenda-day.today .agenda-day-hd { background: var(--navy); }
+  .agenda-day-nome { font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--text-3); }
+  .agenda-day.today .agenda-day-nome { color: var(--teal); }
+  .agenda-day-data { font-size: 18px; font-weight: 800; color: var(--navy); }
+  .agenda-day.today .agenda-day-data { color: #fff; }
+  .agenda-day-body { padding: 10px 12px; }
+  .agenda-event {
+    display: flex; align-items: flex-start; gap: 6px;
+    padding: 5px 0; border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .agenda-event:last-child { border-bottom: none; }
+  .agenda-event-icon { flex-shrink: 0; font-size: 13px; }
+  .agenda-event-text { color: var(--text); line-height: 1.4; }
+  .agenda-event-sub { font-size: 10.5px; color: var(--text-3); }
+  .agenda-empty { color: var(--text-3); font-size: 12px; font-style: italic; padding: 8px 0; }
+
+  /* ── GRÁFICO BARRAS ── */
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; padding: 4px 0; }
+  .bar-row { display: flex; align-items: center; gap: 10px; }
+  .bar-label { font-size: 12px; font-weight: 600; color: var(--text); min-width: 80px; }
+  .bar-track { flex: 1; height: 22px; background: var(--border); border-radius: 4px; overflow: hidden; display: flex; }
+  .bar-seg { height: 100%; transition: width .4s; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; }
+  .bar-total { font-size: 12px; color: var(--text-2); min-width: 28px; text-align: right; }
+
+  /* ── ALERTA DASHBOARD ── */
+  .dash-alert {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    margin-bottom: 8px; font-size: 12.5px;
+  }
+  .dash-alert.warn { background: var(--gold-light); border-left: 3px solid var(--gold); }
+  .dash-alert.danger { background: var(--red-light); border-left: 3px solid var(--red); }
+  .dash-alert-icon { font-size: 16px; flex-shrink: 0; }
+  .dash-alert-text { color: var(--text); }
+  .dash-alert-text b { color: var(--navy); }
+
   /* config page */
   .config-section { margin-bottom: 28px; }
   .config-section h3 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
@@ -1050,6 +1181,9 @@
     <div class="nav-item" onclick="showTab('cards')">
       <span class="icon">📋</span><span>Cards de Atividades</span>
     </div>
+    <div class="nav-item" onclick="showTab('agenda')">
+      <span class="icon">📅</span><span>Agenda da Semana</span>
+    </div>
   </div>
   <div class="nav-section">
     <div class="nav-label">Sistema</div>
@@ -1070,8 +1204,9 @@
 
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="page-title" id="pageTitle">🌴 Férias</div>
+    <div class="page-title" id="pageTitle">🏠 Início</div>
     <div class="topbar-actions">
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="openGlobalSearch()" title="Busca global (Ctrl+K)">🔍</button>
       <button class="btn btn-primary" id="btnTopAction" onclick="openTopAction()">+ Registrar</button>
       <button class="btn btn-ghost btn-sm" onclick="syncData()" title="Sincronizar com Sheets">↻ Sync</button>
     </div>
@@ -1300,14 +1435,92 @@
           </div>
         </div>
 
+        <button class="btn btn-ghost btn-sm" onclick="limparFiltrosCards()" title="Limpar todos os filtros">✕ Limpar</button>
+        <div style="display:flex;align-items:center;gap:6px;margin-left:4px">
+          <span style="font-size:11px;color:var(--text-3)">Agrupar</span>
+          <button class="btn btn-ghost btn-sm btn-icon" id="btnAgrupar" onclick="toggleAgrupamento()" title="Agrupar por colaborador">👤</button>
+        </div>
         <span class="cards-count" id="cardsCount"></span>
       </div>
       <div id="cardsGrid" class="cards-grid"></div>
     </div>
   </div>
 
+  <!-- ═══ AGENDA DA SEMANA ═══ -->
+  <div class="tab-page" id="tab-agenda" style="flex:1;flex-direction:column;padding:0">
+    <div class="page-content" style="flex:1" id="agendaContent"></div>
+  </div>
+
   <!-- SIDE PANELS (rendered per tab) -->
   <div class="side-panel" id="sidePanel" style="display:none"></div>
+</div><!-- end main -->
+
+<!-- ── MODAL CARD DETALHE ── -->
+<div class="modal-overlay" id="modalCardDetalhe">
+  <div class="modal modal-xl">
+    <div class="modal-header">
+      <div style="flex:1;min-width:0">
+        <div id="mcdTipo" style="margin-bottom:4px"></div>
+        <div class="modal-title" id="mcdTitulo" style="font-size:15px;line-height:1.4"></div>
+      </div>
+      <button class="close-btn" onclick="closeModal('modalCardDetalhe')">×</button>
+    </div>
+    <div class="modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div class="card-detail-section">
+          <div class="card-detail-label">📋 Lista / Status</div>
+          <div class="card-detail-value" id="mcdLista"></div>
+        </div>
+        <div class="card-detail-section">
+          <div class="card-detail-label">👤 Responsáveis</div>
+          <div class="card-detail-value" id="mcdResp"></div>
+        </div>
+        <div class="card-detail-section">
+          <div class="card-detail-label">🏷️ Etiquetas</div>
+          <div class="card-detail-value" id="mcdEtiq"></div>
+        </div>
+        <div class="card-detail-section">
+          <div class="card-detail-label">📅 Datas</div>
+          <div class="card-detail-value" id="mcdDatas"></div>
+        </div>
+        <div class="card-detail-section">
+          <div class="card-detail-label">📝 Descrição</div>
+          <div class="card-detail-value" id="mcdDesc" style="white-space:pre-wrap;max-height:200px;overflow-y:auto"></div>
+        </div>
+      </div>
+      <div>
+        <div class="card-detail-section">
+          <div class="card-detail-label">✅ Checklists</div>
+          <div id="mcdCheck"></div>
+        </div>
+        <div class="card-detail-section">
+          <div class="card-detail-label">💬 Comentários</div>
+          <div id="mcdComents" style="max-height:220px;overflow-y:auto"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalCardDetalhe')">Fechar</button>
+      <a id="mcdLink" href="#" target="_blank" class="btn btn-primary">↗ Abrir no Trello</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── BUSCA GLOBAL ── -->
+<div class="global-search-wrap" id="globalSearchWrap" style="display:none" onclick="e => { if(e.target===this) closeGlobalSearch(); }">
+  <div class="global-search-box" onclick="event.stopPropagation()">
+    <div class="global-search-input-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="globalSearchInput" placeholder="Buscar em todos os módulos..." oninput="runGlobalSearch()" autocomplete="off">
+      <span class="close-global" onclick="closeGlobalSearch()">×</span>
+    </div>
+    <div class="global-results" id="globalResults">
+      <div class="global-no-results">Digite para buscar...</div>
+    </div>
+  </div>
+</div>
+
+<div class="main" style="display:none"><!-- placeholder para fechar o main anterior -->
 </div><!-- .main for non-panel tabs -->
 
 <!-- override: side panel is inside content-wrap for tabs that need it -->
@@ -1813,6 +2026,7 @@ const tabTitles = {
   feedbacks: '💬 Feedbacks & PDI',
   conecta: '⭐ Feedbacks Conecta',
   cards: '📋 Cards de Atividades',
+  agenda: '📅 Agenda da Semana',
   config: '⚙️ Configurações'
 };
 
@@ -1824,6 +2038,7 @@ const topActions = {
   feedbacks: 'openModalFB',
   conecta: 'openModalConecta',
   cards: null,
+  agenda: null,
   config: null
 };
 
@@ -1849,6 +2064,7 @@ function showTab(tab) {
   if (tab === 'conecta') renderConecta();
   if (tab === 'inicio') renderDashboard();
   if (tab === 'cards') renderCards();
+  if (tab === 'agenda') renderAgenda();
 }
 
 function openTopAction() {
@@ -1874,6 +2090,7 @@ function renderAll() {
   if (currentTab === 'feedbacks') renderFBTabs();
   if (currentTab === 'cards') renderCards();
   if (currentTab === 'inicio') renderDashboard();
+  if (currentTab === 'agenda') renderAgenda();
   renderSidePanel(currentTab);
 }
 
@@ -2508,48 +2725,92 @@ function previewFicha() {
 function exportFicha() {
   const colab = document.getElementById('fichaColab').value;
   const ciclos = STATE.feedbacks.filter(f => f.colab === colab).sort((a,b) => b.data > a.data ? 1 : -1);
-  let txt = `FICHA DO COLABORADOR — ${colab}\nGerado em: ${new Date().toLocaleDateString('pt-BR')}\n\n`;
-  txt += '═'.repeat(60) + '\n';
+  const dataGer = new Date().toLocaleDateString('pt-BR');
 
-  ciclos.forEach(c => {
-    txt += `\n📅 CICLO: ${fmtDate(c.data)}\n${'─'.repeat(40)}\n`;
-    const campos = [
-      ['Anotações p/ próximo', c.anotacoes],
-      ['Pontos fortes', c.fortes],
-      ['Evolução', c.evolucao],
-      ['Pontos a melhorar', c.melhorar],
-      ['Levantados pelo colaborador', c.colab2],
-      ['Próximos passos', c.passos],
-      ['Outros recados', c.outros],
-      ['Resumo Conecta/Evolui', c.conecta],
-      ['Feedbacks públicos', c.publico]
-    ];
-    campos.forEach(([k,v]) => { if(v) txt += `\n[${k}]\n${v}\n`; });
+  const campos = [
+    ['anotacoes','📌 Anotações para próximo feedback'],
+    ['fortes','✅ Pontos fortes'],
+    ['evolucao','📈 Evolução'],
+    ['melhorar','⚠️ Pontos a melhorar'],
+    ['colab2','💬 Levantados pelo colaborador'],
+    ['passos','🎯 Próximos passos'],
+    ['outros','📣 Outros recados'],
+    ['conecta','📋 Resumo Conecta/Evolui']
+  ];
 
-    if (c.pdi?.length) {
-      txt += `\n[PDI]\n`;
-      c.pdi.forEach((p,i) => {
-        txt += `  ${i+1}. ${p.objetivo}\n     Ações: ${p.acoes}\n     Prazo: ${fmtDate(p.prazo)} | Indicadores: ${p.indicadores}\n`;
+  let html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <title>Ficha — ${colab}</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 13px; color: #1e293b; margin: 0; padding: 0; }
+    .cover { background: #1a3d5c; color: white; padding: 40px 48px; }
+    .cover h1 { font-size: 28px; margin: 0 0 6px; }
+    .cover .sub { color: #2cbfad; font-size: 14px; }
+    .cover .meta { font-size: 12px; color: rgba(255,255,255,.6); margin-top: 12px; }
+    .body { padding: 32px 48px; }
+    .ciclo { margin-bottom: 36px; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+    .ciclo-hd { background: #1a3d5c; color: white; padding: 12px 20px; font-weight: 700; font-size: 14px; }
+    .ciclo-body { padding: 0 20px; }
+    .section { padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
+    .section:last-child { border-bottom: none; }
+    .section-label { font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: #2cbfad; margin-bottom: 6px; }
+    .section-value { line-height: 1.7; white-space: pre-wrap; }
+    .pdi-item { background: #f4f6f9; border-radius: 6px; padding: 10px 14px; margin-bottom: 8px; }
+    .pdi-obj { font-weight: 700; color: #1a3d5c; margin-bottom: 4px; }
+    .pdi-row { font-size: 12px; color: #64748b; margin-bottom: 2px; }
+    .meta-item { display: flex; align-items: center; gap: 12px; background: #f4f6f9; border-radius: 6px; padding: 8px 14px; margin-bottom: 6px; }
+    .meta-bar { flex: 1; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .meta-fill { height: 100%; background: #2cbfad; border-radius: 3px; }
+    .meta-pct { font-weight: 700; color: #1a3d5c; font-size: 12px; min-width: 36px; text-align: right; }
+    @media print { body { font-size: 11px; } .cover { padding: 24px 32px; } .body { padding: 20px 32px; } }
+  </style></head><body>
+  <div class="cover">
+    <h1>${colab}</h1>
+    <div class="sub">Ficha de Feedbacks & PDI · ICM · MV</div>
+    <div class="meta">Gerado em ${dataGer} · ${ciclos.length} ciclo(s) de feedback</div>
+  </div>
+  <div class="body">`;
+
+  if (!ciclos.length) {
+    html += '<p style="color:#94a3b8;text-align:center;padding:40px">Nenhum ciclo de feedback registrado.</p>';
+  } else {
+    ciclos.forEach(c => {
+      html += `<div class="ciclo"><div class="ciclo-hd">📅 Ciclo de ${fmtDate(c.data)}</div><div class="ciclo-body">`;
+      campos.forEach(([key, label]) => {
+        if (c[key]) html += `<div class="section"><div class="section-label">${label}</div><div class="section-value">${c[key].replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>`;
       });
-    }
-    if (c.metas?.length) {
-      txt += `\n[METAS]\n`;
-      c.metas.forEach((m,i) => {
-        txt += `  ${i+1}. ${m.descricao} — ${m.pct}%\n`;
-      });
-    }
-    txt += '\n';
-  });
+      if (c.pdi?.length) {
+        html += `<div class="section"><div class="section-label">📘 PDI — Plano de Desenvolvimento</div>`;
+        c.pdi.forEach(p => {
+          html += `<div class="pdi-item"><div class="pdi-obj">${p.objetivo}</div>
+            <div class="pdi-row"><b>Ações:</b> ${p.acoes}</div>
+            <div class="pdi-row"><b>Prazo:</b> ${fmtDate(p.prazo)} &nbsp;·&nbsp; <b>Indicadores:</b> ${p.indicadores}</div></div>`;
+        });
+        html += '</div>';
+      }
+      if (c.metas?.length) {
+        html += `<div class="section"><div class="section-label">🎯 Metas</div>`;
+        c.metas.forEach(m => {
+          const pct = Math.min(100, parseInt(m.pct)||0);
+          html += `<div class="meta-item"><div style="flex:1"><div style="font-size:12px;font-weight:600">${m.descricao}</div>
+            <div class="meta-bar"><div class="meta-fill" style="width:${pct}%"></div></div></div>
+            <div class="meta-pct">${pct}%</div></div>`;
+        });
+        html += '</div>';
+      }
+      html += '</div></div>';
+    });
+  }
+  html += '</div></body></html>';
 
-  const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `Ficha_${colab.replace(/ /g,'_')}_${new Date().toISOString().slice(0,10)}.txt`;
+  a.download = `Ficha_${colab.replace(/ /g,'_')}_${new Date().toISOString().slice(0,10)}.html`;
   a.click();
   URL.revokeObjectURL(url);
   closeModal('modalFicha');
-  toast('Ficha exportada!', 'success');
+  toast('Ficha exportada! Abra o arquivo e use Ctrl+P para imprimir/salvar como PDF.', 'success');
 }
 
 // ═══════════════════════════════════════════════
@@ -2561,7 +2822,7 @@ function renderSidePanel(tab) {
   const cw = document.querySelector('.content-wrap');
   if (!cw) return;
 
-  if (['config','feedbacks','conecta','inicio','cards'].includes(tab)) {
+  if (['config','feedbacks','conecta','inicio','cards','agenda'].includes(tab)) {
     panel.style.display = 'none'; return;
   }
   panel.style.display = '';
@@ -3274,7 +3535,7 @@ function renderCards() {
 
     const dueFmt = c.vencimento ? fmtDate(c.vencimento) : '';
 
-    return `<div class="card-item">
+    return `<div class="card-item" onclick="openCardDetalhe('${c.id}')" style="cursor:pointer">
       <div class="card-item-top">
         <div style="flex:1">
           ${tipoLabel ? `<span class="card-type-badge ${tipoCls}">${tipoLabel}</span>` : ''}
@@ -3339,13 +3600,14 @@ function renderDashboard() {
 
   // ── Por colaborador: cards ──
   const cardsPorColab = {};
-  STATE.colaboradores.forEach(c => { cardsPorColab[c] = { ativ: 0, meta: 0, prio: 0 }; });
+  STATE.colaboradores.forEach(c => { cardsPorColab[c] = { ativ: 0, meta: 0, prio: 0, concluido: 0 }; });
   cardsAtivos.forEach(card => {
     card.responsaveis.forEach(r => {
       const match = STATE.colaboradores.find(c => r.includes(c.split(' ')[0]) || c.includes(r.split(' ')[0]));
       if (match) {
-        if (!cardsPorColab[match]) cardsPorColab[match] = { ativ: 0, meta: 0, prio: 0 };
-        if (!card.lista.includes('CONCLU')) cardsPorColab[match].ativ++;
+        if (!cardsPorColab[match]) cardsPorColab[match] = { ativ: 0, meta: 0, prio: 0, concluido: 0 };
+        if (card.lista.includes('CONCLU')) { cardsPorColab[match].concluido++; }
+        else { cardsPorColab[match].ativ++; }
         if (card.tipoAtividade === 'Meta' && !card.lista.includes('CONCLU')) cardsPorColab[match].meta++;
         if (card.prioridadeSemana === 'Sim') cardsPorColab[match].prio++;
       }
@@ -3416,23 +3678,52 @@ function renderDashboard() {
         </div>
       </div>
 
-      <!-- Por colaborador -->
+      <!-- Por colaborador com gráfico e alertas -->
       <div class="dash-section">
         <div class="dash-section-title"><span>👥</span> Carga por colaborador</div>
         <div class="dash-card">
-          <div class="dash-card-body">
+          <div class="dash-card-hd">
+            <span>Atividades ativas</span>
+          </div>
+          <div class="dash-card-body" style="padding:16px 20px">
+            <div class="bar-chart">
+              ${STATE.colaboradores.map((c,i) => {
+                const stats = cardsPorColab[c] || { ativ: 0, meta: 0, prio: 0, concluido: 0 };
+                const total = stats.ativ + stats.concluido;
+                const maxAtiv = Math.max(...STATE.colaboradores.map(x => (cardsPorColab[x]||{ativ:0}).ativ), 1);
+                const wAtiv = total ? Math.round(stats.ativ / maxAtiv * 100) : 0;
+                const wMeta = total ? Math.round(stats.meta / maxAtiv * 100) : 0;
+                return `<div class="bar-row">
+                  <div class="bar-label">${c.split(' ')[0]}</div>
+                  <div class="bar-track">
+                    <div class="bar-seg" style="width:${wAtiv}%;background:var(--teal)" title="Atividades: ${stats.ativ}"></div>
+                    <div class="bar-seg" style="width:${Math.max(0,wMeta-wAtiv)}%;background:#6b3cba;opacity:.7" title="Metas: ${stats.meta}"></div>
+                  </div>
+                  <div class="bar-total">${stats.ativ}</div>
+                </div>`;
+              }).join('')}
+            </div>
+            <div style="display:flex;gap:14px;margin-top:10px;font-size:11px;color:var(--text-3)">
+              <span><span style="display:inline-block;width:10px;height:10px;background:var(--teal);border-radius:2px;margin-right:4px"></span>Atividades</span>
+              <span><span style="display:inline-block;width:10px;height:10px;background:#6b3cba;opacity:.7;border-radius:2px;margin-right:4px"></span>Metas</span>
+            </div>
+          </div>
+          <div class="dash-card-body" style="padding:0 0 8px">
             ${STATE.colaboradores.map((c,i) => {
               const stats = cardsPorColab[c] || { ativ: 0, meta: 0, prio: 0 };
               const lastFb = ultimoFb[c];
+              const diasSemFb = lastFb ? Math.floor((new Date() - new Date(lastFb+'T12:00')) / 86400000) : 999;
+              const fbAlerta = diasSemFb > 30;
               return `<div class="dash-list-item">
                 ${avHtml(c, i, 28)}
                 <div class="dash-item-name">
                   <span>${c}</span>
-                  <div class="dash-item-sub">Último feedback: ${lastFb ? fmtDate(lastFb) : '—'}</div>
+                  <div class="dash-item-sub" style="${fbAlerta?'color:var(--red)':''}">
+                    ${fbAlerta ? '⚠️ ' : ''}Último feedback: ${lastFb ? fmtDate(lastFb) + ' (' + diasSemFb + ' dias)' : 'Nunca'}
+                  </div>
                 </div>
                 <div class="dash-item-right" style="font-size:11px;color:var(--text-2)">
-                  <div>${stats.ativ} atividades</div>
-                  <div>${stats.meta} metas · ${stats.prio} prio</div>
+                  <div>${stats.prio} 🔥 prio</div>
                 </div>
               </div>`;
             }).join('')}
@@ -3489,6 +3780,26 @@ function renderDashboard() {
       </div>
     </div>
 
+    <!-- Alertas -->
+    ${(() => {
+      const alertas = [];
+      // Metas vencidas
+      const metasVencidas = cardsAtivos.filter(c => c.tipoAtividade === 'Meta' && c.vencimento && c.vencimento < today && !c.lista.includes('CONCLU'));
+      if (metasVencidas.length) alertas.push(`<div class="dash-alert danger"><span class="dash-alert-icon">⭐</span><div class="dash-alert-text"><b>${metasVencidas.length} meta(s) com prazo vencido:</b> ${metasVencidas.slice(0,3).map(m=>m.titulo.split(' ').slice(0,4).join(' ')+'…').join(', ')}</div></div>`);
+      // Feedbacks atrasados (>30 dias)
+      STATE.colaboradores.forEach(c => {
+        const last = ultimoFb[c];
+        if (!last) { alertas.push(`<div class="dash-alert warn"><span class="dash-alert-icon">💬</span><div class="dash-alert-text"><b>${c}</b> nunca recebeu feedback registrado</div></div>`); return; }
+        const dias = Math.floor((new Date() - new Date(last+'T12:00')) / 86400000);
+        if (dias > 30) alertas.push(`<div class="dash-alert warn"><span class="dash-alert-icon">💬</span><div class="dash-alert-text"><b>${c}</b> — último feedback há <b>${dias} dias</b> (${fmtDate(last)})</div></div>`);
+      });
+      if (!alertas.length) return '';
+      return `<div class="dash-section">
+        <div class="dash-section-title"><span>🔔</span> Alertas</div>
+        <div class="dash-card"><div class="dash-card-body" style="padding:12px 16px">${alertas.join('')}</div></div>
+      </div>`;
+    })()}
+
     <!-- Próximas férias -->
     ${feriasProximas.length > 0 ? `
     <div class="dash-section">
@@ -3510,6 +3821,383 @@ function renderDashboard() {
   `;
 }
 
+// ═══════════════════════════════════════════════
+//  CARDS — LIMPAR FILTROS + AGRUPAMENTO + DETALHE
+// ═══════════════════════════════════════════════
+let cardsAgrupado = false;
+
+function limparFiltrosCards() {
+  document.getElementById('cardBusca').value = '';
+  ['msColab','msTipo','msPrio','msLista','msTag','msVenc'].forEach(id => {
+    MS_STATE[id] = new Set();
+    updateMsLabel(id);
+    const opts = document.querySelectorAll(`#${id}Options .ms-option`);
+    opts.forEach(o => { o.classList.remove('checked'); const cb = o.querySelector('input'); if(cb) cb.checked = false; });
+  });
+  renderCards();
+}
+
+function toggleAgrupamento() {
+  cardsAgrupado = !cardsAgrupado;
+  const btn = document.getElementById('btnAgrupar');
+  if (btn) {
+    btn.style.background = cardsAgrupado ? 'var(--teal)' : '';
+    btn.style.color = cardsAgrupado ? '#fff' : '';
+    btn.style.borderColor = cardsAgrupado ? 'var(--teal)' : '';
+  }
+  renderCards();
+}
+
+function renderCardsAgrupados(data) {
+  const grid = document.getElementById('cardsGrid');
+  // Agrupar por colaborador
+  const grupos = {};
+  const semResp = [];
+  data.forEach(c => {
+    if (!c.responsaveis.length) { semResp.push(c); return; }
+    c.responsaveis.forEach(r => {
+      if (!grupos[r]) grupos[r] = [];
+      grupos[r].push(c);
+    });
+  });
+
+  const today = new Date().toISOString().slice(0,10);
+  let html = '';
+
+  const renderGrupo = (nome, cards) => {
+    const idx = STATE.colaboradores.findIndex(c => nome.includes(c.split(' ')[0]) || c.includes(nome.split(' ')[0]));
+    html += `<div class="cards-group">
+      <div class="cards-group-hd" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'; this.querySelector('.cards-group-toggle').textContent=this.nextElementSibling.style.display===''?'▼':'▶'">
+        ${avHtml(nome.split(' ')[0], idx, 28)}
+        <span class="cards-group-name">${nome}</span>
+        <span class="cards-group-count">${cards.length}</span>
+        <span class="cards-group-toggle">▼</span>
+      </div>
+      <div class="cards-grid">`;
+    cards.forEach(c => { html += renderCardHtml(c, today); });
+    html += `</div></div>`;
+  };
+
+  Object.entries(grupos).sort((a,b) => a[0].localeCompare(b[0])).forEach(([nome, cards]) => renderGrupo(nome, cards));
+  if (semResp.length) renderGrupo('Sem responsável', semResp);
+  grid.innerHTML = html;
+}
+
+function renderCardHtml(c, today) {
+  const isVencido = c.vencimento && c.vencimento < today && c.concluido !== 'Sim';
+  const listaCls = c.lista.includes('NÃO INICIADAS') || c.lista.includes('NAO INICIADAS') ? 'lista-nao-iniciadas'
+                 : c.lista.includes('ANDAMENTO') ? 'lista-em-andamento'
+                 : c.lista.includes('CONCLU') ? 'lista-concluidas'
+                 : 'lista-outros';
+  const tipoCls = c.tipoAtividade === 'Meta' ? 'ctb-meta' : c.tipoAtividade === 'Atividade' ? 'ctb-ativ' : 'ctb-sem';
+  const tipoLabel = c.tipoAtividade === 'Meta' ? '⭐ Meta' : c.tipoAtividade === 'Atividade' ? '✅ Atividade' : '';
+  const respHtml = c.responsaveis.slice(0,3).map((r,i) => avHtml(r.split(' ')[0], i, 24)).join('');
+  const tagHtml = c.etiquetas.slice(0,3).map(t => `<span class="card-tag">${t}</span>`).join('');
+  const dueFmt = c.vencimento ? fmtDate(c.vencimento) : '';
+  return `<div class="card-item" onclick="openCardDetalhe('${c.id}')" style="cursor:pointer">
+    <div class="card-item-top">
+      <div style="flex:1">
+        ${tipoLabel ? `<span class="card-type-badge ${tipoCls}">${tipoLabel}</span>` : ''}
+        ${c.prioridadeSemana === 'Sim' ? '<span class="card-type-badge" style="background:#fff3cd;color:#856404;margin-left:4px">🔥 Prioridade</span>' : ''}
+        <div class="card-item-title" style="margin-top:6px">${c.titulo}</div>
+      </div>
+    </div>
+    <div class="card-item-body">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+        ${respHtml}
+        ${c.responsaveis.length ? `<span style="font-size:11px;color:var(--text-3);margin-left:2px">${c.responsaveis.slice(0,2).map(r=>r.split(' ')[0]).join(', ')}${c.responsaveis.length>2?' +'+(c.responsaveis.length-2):''}</span>` : '<span style="font-size:11px;color:var(--text-3)">Sem responsável</span>'}
+      </div>
+      <div class="card-meta-row">
+        ${tagHtml}
+        ${dueFmt ? `<span class="card-due ${isVencido?'vencido':''}">${dueFmt}${isVencido?' ⚠️':''}</span>` : ''}
+      </div>
+    </div>
+    <div class="card-item-footer">
+      <span class="card-lista-chip ${listaCls}">${c.lista}</span>
+      ${c.url ? `<a href="${c.url}" target="_blank" style="font-size:11px;color:var(--teal);text-decoration:none" onclick="event.stopPropagation()">↗ Trello</a>` : ''}
+    </div>
+  </div>`;
+}
+
+function openCardDetalhe(id) {
+  const c = STATE.cards.find(x => x.id === id);
+  if (!c) return;
+
+  const tipoCls = c.tipoAtividade === 'Meta' ? 'ctb-meta' : c.tipoAtividade === 'Atividade' ? 'ctb-ativ' : '';
+  const tipoLabel = c.tipoAtividade ? `<span class="card-type-badge ${tipoCls}">${c.tipoAtividade === 'Meta' ? '⭐ Meta' : '✅ Atividade'}</span>` : '';
+  const prioLabel = c.prioridadeSemana === 'Sim' ? '<span class="card-type-badge" style="background:#fff3cd;color:#856404;margin-left:6px">🔥 Prioridade da semana</span>' : '';
+
+  document.getElementById('mcdTipo').innerHTML = tipoLabel + prioLabel;
+  document.getElementById('mcdTitulo').textContent = c.titulo;
+  document.getElementById('mcdLista').textContent = c.lista || '—';
+  document.getElementById('mcdResp').textContent = c.responsaveis.join(', ') || '—';
+  document.getElementById('mcdEtiq').innerHTML = c.etiquetas.length
+    ? c.etiquetas.map(t => `<span class="card-tag" style="margin-right:4px">${t}</span>`).join('')
+    : '—';
+
+  const today = new Date().toISOString().slice(0,10);
+  const isVencido = c.vencimento && c.vencimento < today;
+  document.getElementById('mcdDatas').innerHTML = `
+    ${c.dataInicio ? `<div>Início: ${fmtDate(c.dataInicio)}</div>` : ''}
+    ${c.vencimento ? `<div style="${isVencido?'color:var(--red);font-weight:600':''}">Vencimento: ${fmtDate(c.vencimento)}${isVencido?' ⚠️ Vencido':''}</div>` : '<div>Sem vencimento</div>'}
+    ${c.ultimaAtividade ? `<div style="color:var(--text-3);font-size:11.5px">Última atividade: ${fmtDate(c.ultimaAtividade)}</div>` : ''}`;
+
+  // Descrição: limpar markdown básico
+  const desc = (c.descricao || '').replace(/\*\*(.*?)\*\*/g,'$1').replace(/\[([^\]]+)\]\([^)]+\)/g,'$1');
+  document.getElementById('mcdDesc').textContent = desc || '—';
+
+  // Checklists
+  const checkEl = document.getElementById('mcdCheck');
+  if (c.checklists) {
+    const items = c.checklists.split(';').map(s => s.trim()).filter(Boolean);
+    checkEl.innerHTML = items.map(item => {
+      const done = item.match(/\[x\]/i);
+      const text = item.replace(/Checklist[^:]*:/i,'').replace(/\[.\]/g,'').replace(/\[x\]/gi,'').trim();
+      return `<div class="card-checklist-item ${done?'done':''}">
+        <span>${done ? '☑' : '☐'}</span>
+        <span>${text}</span>
+      </div>`;
+    }).join('') || '<span style="color:var(--text-3)">—</span>';
+  } else {
+    checkEl.innerHTML = '<span style="color:var(--text-3)">—</span>';
+  }
+
+  // Comentários
+  const comEl = document.getElementById('mcdComents');
+  if (c.comentarios) {
+    const coms = c.comentarios.split('||').map(s => s.trim()).filter(Boolean);
+    comEl.innerHTML = coms.map(com => {
+      const match = com.match(/^([^(]+)\(([^)]+)\):\s*(.*)/s);
+      if (match) {
+        return `<div class="card-comment">
+          <div class="card-comment-author">${match[1].trim()} · ${fmtDate(match[2].slice(0,10))}</div>
+          ${match[3].trim().replace(/</g,'&lt;')}
+        </div>`;
+      }
+      return `<div class="card-comment">${com.replace(/</g,'&lt;')}</div>`;
+    }).join('');
+  } else {
+    comEl.innerHTML = '<span style="color:var(--text-3)">—</span>';
+  }
+
+  document.getElementById('mcdLink').href = c.url || '#';
+  openModal('modalCardDetalhe');
+}
+
+// ═══════════════════════════════════════════════
+//  BUSCA GLOBAL
+// ═══════════════════════════════════════════════
+function openGlobalSearch() {
+  const wrap = document.getElementById('globalSearchWrap');
+  wrap.style.display = 'flex';
+  setTimeout(() => document.getElementById('globalSearchInput').focus(), 50);
+}
+
+function closeGlobalSearch() {
+  document.getElementById('globalSearchWrap').style.display = 'none';
+  document.getElementById('globalSearchInput').value = '';
+  document.getElementById('globalResults').innerHTML = '<div class="global-no-results">Digite para buscar...</div>';
+}
+
+function runGlobalSearch() {
+  const q = document.getElementById('globalSearchInput').value.toLowerCase().trim();
+  const res = document.getElementById('globalResults');
+  if (!q || q.length < 2) {
+    res.innerHTML = '<div class="global-no-results">Digite ao menos 2 caracteres...</div>';
+    return;
+  }
+
+  let sections = '';
+  let total = 0;
+
+  // Cards
+  const listasExcluir = ['LINKS UTEIS ICM','ATIVIDADES ESCOPO GERAL'];
+  const cards = STATE.cards.filter(c => !listasExcluir.includes(c.lista) && (c.titulo.toLowerCase().includes(q) || c.etiquetas.some(t => t.toLowerCase().includes(q))));
+  if (cards.length) {
+    sections += `<div class="global-section-label">📋 Cards de Atividades (${cards.length})</div>`;
+    sections += cards.slice(0,6).map(c => `
+      <div class="global-result-item" onclick="closeGlobalSearch();showTab('cards');setTimeout(()=>{document.getElementById('cardBusca').value='${c.titulo.replace(/'/g,"\\'")}';renderCards();},100)">
+        <span class="global-result-icon">${c.tipoAtividade==='Meta'?'⭐':'✅'}</span>
+        <div>
+          <div class="global-result-title">${c.titulo}</div>
+          <div class="global-result-sub">${c.lista} · ${c.responsaveis.slice(0,2).map(r=>r.split(' ')[0]).join(', ')||'—'}</div>
+        </div>
+        ${c.prioridadeSemana==='Sim'?'<span style="font-size:11px;color:#856404">🔥</span>':''}
+      </div>`).join('');
+    total += cards.length;
+  }
+
+  // Feedbacks
+  const fbs = STATE.feedbacks.filter(f =>
+    f.colab.toLowerCase().includes(q) ||
+    (f.fortes||'').toLowerCase().includes(q) ||
+    (f.passos||'').toLowerCase().includes(q) ||
+    (f.melhorar||'').toLowerCase().includes(q));
+  if (fbs.length) {
+    sections += `<div class="global-section-label">💬 Feedbacks (${fbs.length})</div>`;
+    sections += fbs.slice(0,4).map(f => `
+      <div class="global-result-item" onclick="closeGlobalSearch();fbColabAtivo='${f.colab}';showTab('feedbacks')">
+        <span class="global-result-icon">💬</span>
+        <div>
+          <div class="global-result-title">${f.colab}</div>
+          <div class="global-result-sub">Ciclo de ${fmtDate(f.data)}</div>
+        </div>
+      </div>`).join('');
+    total += fbs.length;
+  }
+
+  // Férias
+  const fer = STATE.ferias.filter(f => f.colab.toLowerCase().includes(q) || (f.obs||'').toLowerCase().includes(q));
+  if (fer.length) {
+    sections += `<div class="global-section-label">🌴 Férias (${fer.length})</div>`;
+    sections += fer.slice(0,3).map(f => `
+      <div class="global-result-item" onclick="closeGlobalSearch();showTab('ferias')">
+        <span class="global-result-icon">🌴</span>
+        <div>
+          <div class="global-result-title">${f.colab}</div>
+          <div class="global-result-sub">${fmtDate(f.inicio)} → ${fmtDate(f.retorno)} · ${f.dias} dias</div>
+        </div>
+      </div>`).join('');
+    total += fer.length;
+  }
+
+  // Home Office
+  const ho = STATE.homeoffice.filter(h => h.colab.toLowerCase().includes(q) || (h.motivo||'').toLowerCase().includes(q));
+  if (ho.length) {
+    sections += `<div class="global-section-label">🏠 Home Office / Ausências (${ho.length})</div>`;
+    sections += ho.slice(0,3).map(h => `
+      <div class="global-result-item" onclick="closeGlobalSearch();showTab('homeoffice')">
+        <span class="global-result-icon">${h.tipo==='Home Office'?'🏠':'⚠️'}</span>
+        <div>
+          <div class="global-result-title">${h.colab}</div>
+          <div class="global-result-sub">${h.tipo} · ${fmtDate(h.data)}</div>
+        </div>
+      </div>`).join('');
+    total += ho.length;
+  }
+
+  // Banco horas
+  const bh = STATE.bancoHoras.filter(b => b.colab.toLowerCase().includes(q) || (b.justif||'').toLowerCase().includes(q));
+  if (bh.length) {
+    sections += `<div class="global-section-label">⏱️ Banco de Horas (${bh.length})</div>`;
+    sections += bh.slice(0,3).map(b => `
+      <div class="global-result-item" onclick="closeGlobalSearch();showTab('banco')">
+        <span class="global-result-icon">⏱️</span>
+        <div>
+          <div class="global-result-title">${b.colab}</div>
+          <div class="global-result-sub">Saldo: ${b.saldoDisplay||b.saldo+'h'}</div>
+        </div>
+      </div>`).join('');
+    total += bh.length;
+  }
+
+  res.innerHTML = total ? sections : `<div class="global-no-results">Nenhum resultado para "<b>${q}</b>"</div>`;
+}
+
+// Ctrl+K para abrir busca global
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openGlobalSearch(); }
+  if (e.key === 'Escape') closeGlobalSearch();
+});
+// fechar ao clicar fora do box
+document.getElementById('globalSearchWrap')?.addEventListener('click', function(e) {
+  if (e.target === this) closeGlobalSearch();
+});
+
+// ═══════════════════════════════════════════════
+//  AGENDA DA SEMANA
+// ═══════════════════════════════════════════════
+function renderAgenda() {
+  const el = document.getElementById('agendaContent');
+  if (!el) return;
+
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const diasSemana = [];
+  // Pegar seg-sex da semana corrente
+  const dow = hoje.getDay(); // 0=dom
+  const seg = new Date(hoje); seg.setDate(hoje.getDate() - (dow === 0 ? 6 : dow - 1));
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(seg); d.setDate(seg.getDate() + i);
+    diasSemana.push(d);
+  }
+
+  const todayStr = hoje.toISOString().slice(0,10);
+  const nomes = ['Segunda','Terça','Quarta','Quinta','Sexta'];
+
+  let html = `<div style="margin-bottom:20px">
+    <div style="font-size:18px;font-weight:700;color:var(--navy)">Semana de ${diasSemana[0].toLocaleDateString('pt-BR',{day:'2-digit',month:'long'})} a ${diasSemana[4].toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+  </div>
+  <div class="agenda-grid">`;
+
+  diasSemana.forEach((dia, i) => {
+    const dStr = dia.toISOString().slice(0,10);
+    const isToday = dStr === todayStr;
+    const eventos = [];
+
+    // HO/Ausências
+    STATE.homeoffice.filter(h => h.data === dStr).forEach(h => {
+      eventos.push({ icon: h.tipo === 'Home Office' ? '🏠' : '⚠️', text: h.colab, sub: h.tipo + (h.periodo !== 'Dia inteiro' ? ' · ' + h.periodo : '') });
+    });
+
+    // Férias
+    STATE.ferias.filter(f => f.inicio <= dStr && f.retorno >= dStr).forEach(f => {
+      eventos.push({ icon: '🌴', text: f.colab, sub: 'Férias' });
+    });
+
+    // Cards com vencimento neste dia
+    const listasExcluir = ['LINKS UTEIS ICM','ATIVIDADES ESCOPO GERAL'];
+    STATE.cards.filter(c => c.vencimento === dStr && !listasExcluir.includes(c.lista) && !c.lista.includes('CONCLU')).forEach(c => {
+      const resp = c.responsaveis.map(r => r.split(' ')[0]).join(', ');
+      eventos.push({ icon: c.tipoAtividade === 'Meta' ? '⭐' : '📋', text: c.titulo.length > 35 ? c.titulo.slice(0,35)+'…' : c.titulo, sub: resp || '—' });
+    });
+
+    html += `<div class="agenda-day${isToday ? ' today' : ''}">
+      <div class="agenda-day-hd">
+        <div class="agenda-day-nome">${nomes[i]}</div>
+        <div class="agenda-day-data">${dia.getDate()}</div>
+      </div>
+      <div class="agenda-day-body">`;
+
+    if (!eventos.length) {
+      html += `<div class="agenda-empty">Sem eventos</div>`;
+    } else {
+      eventos.forEach(ev => {
+        html += `<div class="agenda-event">
+          <span class="agenda-event-icon">${ev.icon}</span>
+          <div>
+            <div class="agenda-event-text">${ev.text}</div>
+            <div class="agenda-event-sub">${ev.sub}</div>
+          </div>
+        </div>`;
+      });
+    }
+    html += `</div></div>`;
+  });
+
+  html += '</div>';
+
+  // Resumo abaixo da agenda
+  const cards7dias = STATE.cards.filter(c => {
+    if (!c.vencimento || c.lista.includes('CONCLU') || ['LINKS UTEIS ICM','ATIVIDADES ESCOPO GERAL'].includes(c.lista)) return false;
+    const d = c.vencimento;
+    return d >= todayStr && d <= diasSemana[4].toISOString().slice(0,10);
+  });
+
+  if (cards7dias.length) {
+    html += `<div style="margin-top:28px">
+      <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:12px">📋 Entregas desta semana (${cards7dias.length})</div>
+      <div class="cards-grid">
+        ${cards7dias.map(c => renderCardHtml(c, todayStr)).join('')}
+      </div>
+    </div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════
+//  DASHBOARD — melhorias
+// ═══════════════════════════════════════════════
 // ═══════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════
