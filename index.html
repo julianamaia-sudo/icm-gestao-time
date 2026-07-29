@@ -2863,46 +2863,80 @@ async function processCardsFile(file) {
 
     if (!ws) throw new Error('Nenhuma aba encontrada no arquivo. Abas disponíveis: ' + wb.SheetNames.join(', '));
 
-    const rows = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
+    // Ler como array de arrays para evitar problemas com acentos nos nomes das colunas
+    const rawMatrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
 
-    if (!rows || rows.length === 0) throw new Error('Arquivo sem dados ou formato inesperado. Verifique se é o arquivo exportado pelo app do Trello.');
+    if (!rawMatrix || rawMatrix.length < 2) throw new Error('Arquivo sem dados. Verifique se é o arquivo exportado pelo app do Trello.');
 
-    // Detecta automaticamente as colunas disponíveis (para debug)
-    const colunasDisponiveis = rows.length > 0 ? Object.keys(rows[0]) : [];
-    console.log('Colunas detectadas:', colunasDisponiveis);
+    // Mapear colunas pelo conteúdo do cabeçalho (case-insensitive, ignora acentos)
+    const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    const headers = rawMatrix[0];
+    const col = name => {
+      const n = norm(name);
+      const idx = headers.findIndex(h => norm(h) === n);
+      return idx;
+    };
+
+    // Índices das colunas
+    const iID    = col('ID');
+    const iLista = col('Lista');
+    const iTit   = col('Titulo');
+    const iResp  = col('Responsaveis');
+    const iStat  = col('Status');
+    const iIni   = col('Data Inicio');
+    const iVenc  = col('Vencimento');
+    const iConc  = col('Concluido');
+    const iUlt   = col('Ultima Atividade');
+    const iURL   = col('URL');
+    const iDesc  = col('Descricao');
+    const iEtiq  = col('Etiquetas');
+    const iCheck = col('Checklists');
+    const iCom   = col('Comentarios');
+    const iTipo  = col('Tipo Atividade');
+    const iPrio  = col('Prioridade da Semana');
+    const iMeta  = col('Entrega Meta ICM');
+
+    console.log('Cabeçalhos encontrados:', headers);
+    console.log('Índice ID:', iID, '| Lista:', iLista, '| Título:', iTit);
+
+    if (iID === -1 || iTit === -1) throw new Error('Colunas "ID" ou "Título" não encontradas. Cabeçalhos detectados: ' + headers.join(', '));
+
+    const dataRows = rawMatrix.slice(1).filter(r => r[iID]);
+
+    if (dataRows.length === 0) throw new Error('Nenhuma linha com dados encontrada no arquivo.');
 
     let criados = 0, atualizados = 0;
 
-    rows.forEach(row => {
-      const id = String(row['ID'] || '').trim();
+    const g = (row, idx) => idx >= 0 ? String(row[idx] || '').trim() : '';
+
+    dataRows.forEach(row => {
+      const id = g(row, iID);
       if (!id) return;
 
-      // Responsáveis: pode vir como string com vírgula
-      const respRaw = String(row['Responsáveis'] || '').trim();
+      const respRaw = g(row, iResp);
       const responsaveis = respRaw ? respRaw.split(',').map(r => r.trim()).filter(Boolean) : [];
 
-      // Etiquetas
-      const etiquetasRaw = String(row['Etiquetas'] || '').trim();
+      const etiquetasRaw = g(row, iEtiq);
       const etiquetas = etiquetasRaw ? etiquetasRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
 
       const card = {
         id,
-        lista: String(row['Lista'] || '').trim(),
-        titulo: String(row['Título'] || '').trim(),
+        lista: g(row, iLista),
+        titulo: g(row, iTit),
         responsaveis,
-        status: String(row['Status'] || '').trim(),
-        dataInicio: fmtDateRaw(row['Data Início']),
-        vencimento: fmtDateRaw(row['Vencimento']),
-        concluido: String(row['Concluído'] || '').trim(),
-        ultimaAtividade: fmtDateRaw(row['Última Atividade']),
-        url: String(row['URL'] || '').trim(),
-        descricao: String(row['Descrição'] || '').trim(),
+        status: g(row, iStat),
+        dataInicio: fmtDateRaw(g(row, iIni)),
+        vencimento: fmtDateRaw(g(row, iVenc)),
+        concluido: g(row, iConc),
+        ultimaAtividade: fmtDateRaw(g(row, iUlt)),
+        url: g(row, iURL),
+        descricao: g(row, iDesc),
         etiquetas,
-        checklists: String(row['Checklists'] || '').trim(),
-        comentarios: String(row['Comentários'] || '').trim(),
-        tipoAtividade: String(row['Tipo Atividade'] || '').trim(),
-        prioridadeSemana: String(row['Prioridade da Semana'] || '').trim(),
-        entregaMeta: String(row['Entrega Meta ICM'] || '').trim(),
+        checklists: g(row, iCheck),
+        comentarios: g(row, iCom),
+        tipoAtividade: g(row, iTipo),
+        prioridadeSemana: g(row, iPrio),
+        entregaMeta: g(row, iMeta),
       };
 
       const idx = STATE.cards.findIndex(c => c.id === id);
