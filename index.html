@@ -893,6 +893,61 @@
   .lista-concluidas    { background: var(--green-light); color: var(--green); }
   .lista-outros        { background: var(--bg); color: var(--text-3); }
 
+  /* ── MULTISELECT DROPDOWN ── */
+  .ms-wrap {
+    position: relative;
+    display: inline-block;
+  }
+  .ms-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 10px; height: 34px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--bg); font-family: inherit; font-size: 12.5px;
+    color: var(--text); cursor: pointer; white-space: nowrap;
+    min-width: 160px; justify-content: space-between;
+    transition: border .15s;
+  }
+  .ms-btn:focus, .ms-btn.open { border-color: var(--teal); outline: none; background: #fff; }
+  .ms-btn .ms-arrow { color: var(--text-3); font-size: 10px; flex-shrink: 0; }
+  .ms-btn .ms-label { overflow: hidden; text-overflow: ellipsis; flex: 1; text-align: left; }
+  .ms-dropdown {
+    display: none;
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 200;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); box-shadow: var(--shadow-lg);
+    min-width: 220px; max-height: 260px; overflow-y: auto;
+  }
+  .ms-wrap.open .ms-dropdown { display: block; }
+  .ms-search {
+    padding: 8px 10px; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: #fff;
+  }
+  .ms-search input {
+    width: 100%; padding: 5px 8px; font-size: 12px;
+    border: 1px solid var(--border); border-radius: 4px;
+    font-family: inherit; background: var(--bg);
+  }
+  .ms-option {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 12px; font-size: 12.5px; cursor: pointer;
+    color: var(--text); transition: background .1s;
+    user-select: none;
+  }
+  .ms-option:hover { background: var(--teal-light); }
+  .ms-option input[type=checkbox] { accent-color: var(--teal); width: 14px; height: 14px; flex-shrink: 0; }
+  .ms-option.checked { font-weight: 600; }
+  .ms-clear {
+    padding: 6px 12px; font-size: 11.5px; color: var(--teal);
+    cursor: pointer; border-top: 1px solid var(--border);
+    text-align: center; font-weight: 600;
+  }
+  .ms-clear:hover { background: var(--teal-light); }
+  .ms-badge {
+    background: var(--teal); color: #fff;
+    border-radius: 10px; padding: 1px 6px;
+    font-size: 10px; font-weight: 700; margin-left: 4px;
+  }
+
   .import-area {
     border: 2px dashed var(--border);
     border-radius: var(--radius);
@@ -1168,25 +1223,71 @@
       </div>
       <input type="file" id="cardFileInput" accept=".xlsx" style="display:none" onchange="handleFileCards(event)">
       <div class="cards-toolbar" id="cardsToolbar" style="display:none">
-        <input type="text" id="cardBusca" placeholder="🔍 Buscar por nome..." oninput="renderCards()">
-        <select id="cardFiltroColab" onchange="renderCards()">
-          <option value="">Todos os responsáveis</option>
-        </select>
-        <select id="cardFiltroTipo" onchange="renderCards()">
-          <option value="">Tipo: todos</option>
-          <option value="Meta">⭐ Meta</option>
-          <option value="Atividade">✅ Atividade</option>
-          <option value="">Sem tipo</option>
-        </select>
-        <select id="cardFiltroPrio" onchange="renderCards()">
-          <option value="">Prioridade semana: todas</option>
-          <option value="Sim">🔥 Prioridade da semana</option>
-          <option value="Não">Não prioritárias</option>
-        </select>
-        <select id="cardFiltroLista" onchange="renderCards()">
-          <option value="">Todas as listas</option>
-        </select>
-        <input type="text" id="cardFiltroTag" placeholder="🏷️ Tag..." oninput="renderCards()" style="max-width:130px">
+        <input type="text" id="cardBusca" placeholder="🔍 Buscar por nome..." oninput="renderCards()" style="min-width:200px">
+
+        <!-- Responsáveis multiselect -->
+        <div class="ms-wrap" id="msColab">
+          <button class="ms-btn" onclick="toggleMs('msColab')" type="button">
+            <span class="ms-label" id="msColabLabel">Responsáveis</span>
+            <span class="ms-arrow">▼</span>
+          </button>
+          <div class="ms-dropdown">
+            <div class="ms-search"><input type="text" placeholder="Buscar..." oninput="filterMsOptions('msColab',this.value)"></div>
+            <div id="msColabOptions"></div>
+            <div class="ms-clear" onclick="clearMs('msColab')">Limpar seleção</div>
+          </div>
+        </div>
+
+        <!-- Tipo multiselect -->
+        <div class="ms-wrap" id="msTipo">
+          <button class="ms-btn" onclick="toggleMs('msTipo')" type="button">
+            <span class="ms-label" id="msTipoLabel">Tipo</span>
+            <span class="ms-arrow">▼</span>
+          </button>
+          <div class="ms-dropdown">
+            <div id="msTipoOptions"></div>
+            <div class="ms-clear" onclick="clearMs('msTipo')">Limpar seleção</div>
+          </div>
+        </div>
+
+        <!-- Prioridade semana multiselect -->
+        <div class="ms-wrap" id="msPrio">
+          <button class="ms-btn" onclick="toggleMs('msPrio')" type="button">
+            <span class="ms-label" id="msPrioLabel">Prioridade semana</span>
+            <span class="ms-arrow">▼</span>
+          </button>
+          <div class="ms-dropdown">
+            <div id="msPrioOptions"></div>
+            <div class="ms-clear" onclick="clearMs('msPrio')">Limpar seleção</div>
+          </div>
+        </div>
+
+        <!-- Lista multiselect -->
+        <div class="ms-wrap" id="msLista">
+          <button class="ms-btn" onclick="toggleMs('msLista')" type="button">
+            <span class="ms-label" id="msListaLabel">Listas</span>
+            <span class="ms-arrow">▼</span>
+          </button>
+          <div class="ms-dropdown">
+            <div class="ms-search"><input type="text" placeholder="Buscar..." oninput="filterMsOptions('msLista',this.value)"></div>
+            <div id="msListaOptions"></div>
+            <div class="ms-clear" onclick="clearMs('msLista')">Limpar seleção</div>
+          </div>
+        </div>
+
+        <!-- Tag multiselect -->
+        <div class="ms-wrap" id="msTag">
+          <button class="ms-btn" onclick="toggleMs('msTag')" type="button">
+            <span class="ms-label" id="msTagLabel">Tags</span>
+            <span class="ms-arrow">▼</span>
+          </button>
+          <div class="ms-dropdown">
+            <div class="ms-search"><input type="text" placeholder="Buscar..." oninput="filterMsOptions('msTag',this.value)"></div>
+            <div id="msTagOptions"></div>
+            <div class="ms-clear" onclick="clearMs('msTag')">Limpar seleção</div>
+          </div>
+        </div>
+
         <span class="cards-count" id="cardsCount"></span>
       </div>
       <div id="cardsGrid" class="cards-grid"></div>
@@ -2947,6 +3048,11 @@ async function processCardsFile(file) {
     // Cards são reimportados do Excel — não precisam de persistência no Sheets
     // Salvar contagem no localStorage para referência
     localStorage.setItem('icm_cards_cache', JSON.stringify(STATE.cards));
+    // Resetar opções dos multiselects para repopular com novos dados
+    ['msColab','msTipo','msPrio','msLista','msTag'].forEach(id => {
+      const el = document.getElementById(id + 'Options');
+      if (el) el.innerHTML = '';
+    });
 
     toast(`✅ ${criados} novos · ${atualizados} atualizados`, 'success');
     renderCards();
@@ -2972,6 +3078,81 @@ function fmtDateRaw(val) {
 // ═══════════════════════════════════════════════
 //  CARDS — RENDER
 // ═══════════════════════════════════════════════
+// ── MULTISELECT ENGINE ──────────────────────────────
+const MS_STATE = {}; // { id: Set<string> }
+
+function getMsSelected(id) {
+  return MS_STATE[id] || new Set();
+}
+
+function toggleMs(id) {
+  // fechar outros abertos
+  document.querySelectorAll('.ms-wrap.open').forEach(el => {
+    if (el.id !== id) el.classList.remove('open');
+  });
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  el.querySelector('.ms-btn').classList.toggle('open', el.classList.contains('open'));
+}
+
+function clearMs(id) {
+  MS_STATE[id] = new Set();
+  populateMsOptions(id);
+  updateMsLabel(id);
+  renderCards();
+}
+
+function filterMsOptions(id, query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll(`#${id}Options .ms-option`).forEach(opt => {
+    opt.style.display = opt.dataset.val.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function populateMsOptions(id, values) {
+  const container = document.getElementById(id + 'Options');
+  if (!container) return;
+  if (values) {
+    // só popula se vier novos valores, preservando seleção
+    const cur = MS_STATE[id] || new Set();
+    container.innerHTML = values.map(v => `
+      <div class="ms-option ${cur.has(v)?'checked':''}" data-val="${v}" onclick="toggleMsOption('${id}','${v.replace(/'/g,"\'")}',this)">
+        <input type="checkbox" ${cur.has(v)?'checked':''} onclick="event.stopPropagation()">
+        <span>${v}</span>
+      </div>`).join('');
+  }
+}
+
+function toggleMsOption(id, val, el) {
+  if (!MS_STATE[id]) MS_STATE[id] = new Set();
+  if (MS_STATE[id].has(val)) { MS_STATE[id].delete(val); el.classList.remove('checked'); el.querySelector('input').checked = false; }
+  else { MS_STATE[id].add(val); el.classList.add('checked'); el.querySelector('input').checked = true; }
+  updateMsLabel(id);
+  renderCards();
+}
+
+function updateMsLabel(id) {
+  const sel = getMsSelected(id);
+  const labelEl = document.getElementById(id + 'Label');
+  if (!labelEl) return;
+  const defaults = { msColab: 'Responsáveis', msTipo: 'Tipo', msPrio: 'Prioridade semana', msLista: 'Listas', msTag: 'Tags' };
+  if (sel.size === 0) {
+    labelEl.innerHTML = defaults[id] || id;
+  } else {
+    labelEl.innerHTML = `${[...sel].slice(0,2).join(', ')}${sel.size > 2 ? ' +' + (sel.size-2) : ''} <span class="ms-badge">${sel.size}</span>`;
+  }
+}
+
+// Fechar dropdown ao clicar fora
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ms-wrap')) {
+    document.querySelectorAll('.ms-wrap.open').forEach(el => {
+      el.classList.remove('open');
+      el.querySelector('.ms-btn')?.classList.remove('open');
+    });
+  }
+});
+
 function renderCards() {
   const grid = document.getElementById('cardsGrid');
   const toolbar = document.getElementById('cardsToolbar');
@@ -2988,34 +3169,39 @@ function renderCards() {
   importArea.style.display = 'none';
   toolbar.style.display = '';
 
-  // Repopular selects únicos
-  const colabSel = document.getElementById('cardFiltroColab');
-  const listaSel = document.getElementById('cardFiltroLista');
-  const allColabs = [...new Set(STATE.cards.flatMap(c => c.responsaveis))].filter(Boolean).sort();
-  const allListas = [...new Set(STATE.cards.map(c => c.lista))].filter(Boolean).sort();
-  const curColab = colabSel.value, curLista = listaSel.value;
-  colabSel.innerHTML = '<option value="">Todos os responsáveis</option>' + allColabs.map(c => `<option value="${c}">${c}</option>`).join('');
-  listaSel.innerHTML = '<option value="">Todas as listas</option>' + allListas.map(l => `<option value="${l}">${l}</option>`).join('');
-  if (curColab) colabSel.value = curColab;
-  if (curLista) listaSel.value = curLista;
-
-  const busca = (document.getElementById('cardBusca')?.value || '').toLowerCase();
-  const filtColab = colabSel.value;
-  const filtTipo = document.getElementById('cardFiltroTipo')?.value || '';
-  const filtPrio = document.getElementById('cardFiltroPrio')?.value || '';
-  const filtLista = listaSel.value;
-  const filtTag = (document.getElementById('cardFiltroTag')?.value || '').toLowerCase();
-
-  // Excluir listas de links/uteis/escopo geral
   const listasExcluir = ['LINKS UTEIS ICM', 'ATIVIDADES ESCOPO GERAL'];
+  const cardsVisiveis = STATE.cards.filter(c => !listasExcluir.includes(c.lista));
 
-  let data = STATE.cards.filter(c => !listasExcluir.includes(c.lista));
-  if (busca) data = data.filter(c => c.titulo.toLowerCase().includes(busca));
-  if (filtColab) data = data.filter(c => c.responsaveis.includes(filtColab));
-  if (filtTipo) data = data.filter(c => c.tipoAtividade === filtTipo);
-  if (filtPrio) data = data.filter(c => c.prioridadeSemana === filtPrio);
-  if (filtLista) data = data.filter(c => c.lista === filtLista);
-  if (filtTag) data = data.filter(c => c.etiquetas.some(t => t.toLowerCase().includes(filtTag)));
+  // Popula opções dos multiselects (só na primeira vez ou ao reimportar)
+  const allColabs = [...new Set(cardsVisiveis.flatMap(c => c.responsaveis))].filter(Boolean).sort();
+  const allListas = [...new Set(cardsVisiveis.map(c => c.lista))].filter(Boolean).sort();
+  const allTipos  = [...new Set(cardsVisiveis.map(c => c.tipoAtividade).filter(Boolean))].sort();
+  const allPrios  = [...new Set(cardsVisiveis.map(c => c.prioridadeSemana).filter(Boolean))].sort();
+  const allTags   = [...new Set(cardsVisiveis.flatMap(c => c.etiquetas))].filter(Boolean).sort();
+
+  if (!document.querySelector('#msColabOptions .ms-option')) {
+    populateMsOptions('msColab', allColabs);
+    populateMsOptions('msTipo',  allTipos.length ? allTipos : ['Meta','Atividade']);
+    populateMsOptions('msPrio',  allPrios.length ? allPrios : ['Sim','Não']);
+    populateMsOptions('msLista', allListas);
+    populateMsOptions('msTag',   allTags);
+  }
+
+  // Filtros ativos
+  const busca     = (document.getElementById('cardBusca')?.value || '').toLowerCase();
+  const selColab  = getMsSelected('msColab');
+  const selTipo   = getMsSelected('msTipo');
+  const selPrio   = getMsSelected('msPrio');
+  const selLista  = getMsSelected('msLista');
+  const selTag    = getMsSelected('msTag');
+
+  let data = cardsVisiveis;
+  if (busca)          data = data.filter(c => c.titulo.toLowerCase().includes(busca));
+  if (selColab.size)  data = data.filter(c => c.responsaveis.some(r => selColab.has(r)));
+  if (selTipo.size)   data = data.filter(c => selTipo.has(c.tipoAtividade));
+  if (selPrio.size)   data = data.filter(c => selPrio.has(c.prioridadeSemana));
+  if (selLista.size)  data = data.filter(c => selLista.has(c.lista));
+  if (selTag.size)    data = data.filter(c => c.etiquetas.some(t => selTag.has(t)));
 
   // Ordenar: prioridade semana primeiro, depois por lista, depois por vencimento
   data.sort((a, b) => {
