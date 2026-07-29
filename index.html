@@ -2944,10 +2944,9 @@ async function processCardsFile(file) {
       else { STATE.cards.push(card); criados++; }
     });
 
-    // Salvar no Sheets se configurado
-    if (STATE.scriptUrl) {
-      await saveRecord('cards', { id: 'batch', cards: JSON.stringify(STATE.cards) });
-    }
+    // Cards são reimportados do Excel — não precisam de persistência no Sheets
+    // Salvar contagem no localStorage para referência
+    localStorage.setItem('icm_cards_cache', JSON.stringify(STATE.cards));
 
     toast(`✅ ${criados} novos · ${atualizados} atualizados`, 'success');
     renderCards();
@@ -3298,6 +3297,9 @@ function renderDashboard() {
 //  INIT
 // ═══════════════════════════════════════════════
 loadConfig();
+// Carregar cache de cards do localStorage
+const cardsCache = localStorage.getItem('icm_cards_cache');
+if (cardsCache) { try { STATE.cards = JSON.parse(cardsCache); } catch(e) {} }
 repopulateSelects();
 renderAll();
 showTab('inicio');
