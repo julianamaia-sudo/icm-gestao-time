@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestão Time · ICM</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap');
 
@@ -742,6 +743,179 @@
     .main { margin-left: 60px; }
   }
 
+  /* ── DASHBOARD ── */
+  .dash-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .dash-kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .dash-kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .dash-kpi.teal::before { background: var(--teal); }
+  .dash-kpi.gold::before { background: var(--gold); }
+  .dash-kpi.green::before { background: var(--green); }
+  .dash-kpi.red::before { background: var(--red); }
+  .dash-kpi.navy::before { background: var(--navy); }
+  .dash-kpi.purple::before { background: #6b3cba; }
+  .kpi-label { font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--text-3); margin-bottom: 6px; }
+  .kpi-value { font-size: 32px; font-weight: 800; color: var(--navy); line-height: 1; }
+  .kpi-sub { font-size: 11.5px; color: var(--text-2); margin-top: 6px; }
+  .kpi-icon { position: absolute; top: 14px; right: 16px; font-size: 22px; opacity: .15; }
+
+  .dash-section { margin-bottom: 28px; }
+  .dash-section-title {
+    font-size: 13px; font-weight: 700; color: var(--navy);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dash-section-title span { font-size: 16px; }
+  .dash-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 1100px) { .dash-row { grid-template-columns: 1fr; } }
+
+  .dash-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .dash-card-hd {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px; font-weight: 700; color: var(--navy);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .dash-card-body { padding: 0; }
+  .dash-list-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12.5px;
+  }
+  .dash-list-item:last-child { border-bottom: none; }
+  .dash-item-name { font-weight: 600; color: var(--text); flex: 1; min-width: 0; }
+  .dash-item-name .truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+  .dash-item-sub { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .dash-item-right { flex-shrink: 0; text-align: right; }
+
+  /* ── CARDS MODULE ── */
+  .cards-toolbar {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .cards-toolbar input, .cards-toolbar select {
+    padding: 6px 10px; font-size: 12.5px; height: 34px;
+  }
+  .cards-toolbar input { min-width: 180px; }
+  .cards-count {
+    margin-left: auto;
+    font-size: 12px; color: var(--text-3); white-space: nowrap;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 12px;
+  }
+  .card-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: box-shadow .15s;
+  }
+  .card-item:hover { box-shadow: var(--shadow-lg); }
+  .card-item-top {
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .card-type-badge {
+    flex-shrink: 0; padding: 2px 8px;
+    border-radius: 10px; font-size: 10.5px; font-weight: 700;
+    letter-spacing: .3px;
+  }
+  .ctb-meta { background: var(--purp-l, #f0e8ff); color: #6b3cba; }
+  .ctb-ativ { background: var(--teal-light); color: #1a9184; }
+  .ctb-sem  { background: var(--bg); color: var(--text-3); }
+  .card-item-title {
+    font-size: 13px; font-weight: 600; color: var(--navy);
+    line-height: 1.4; flex: 1;
+  }
+  .card-item-body { padding: 10px 14px; }
+  .card-meta-row {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .card-tag {
+    font-size: 10.5px; font-weight: 600; padding: 2px 7px;
+    border-radius: 10px; background: var(--bg); color: var(--text-2);
+    border: 1px solid var(--border);
+  }
+  .card-tag.prio-sim { background: #fff3cd; color: #856404; border-color: #ffc107; }
+  .card-due { font-size: 11px; color: var(--text-3); }
+  .card-due.vencido { color: var(--red); font-weight: 600; }
+  .card-item-footer {
+    padding: 8px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-lista-chip {
+    font-size: 10.5px; font-weight: 600; padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .lista-nao-iniciadas { background: #f1f5f9; color: var(--text-2); }
+  .lista-em-andamento  { background: var(--teal-light); color: #1a9184; }
+  .lista-concluidas    { background: var(--green-light); color: var(--green); }
+  .lista-outros        { background: var(--bg); color: var(--text-3); }
+
+  .import-area {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+    background: var(--surface);
+    margin-bottom: 20px;
+  }
+  .import-area:hover, .import-area.dragover { border-color: var(--teal); background: var(--teal-light); }
+  .import-area .big { font-size: 36px; margin-bottom: 10px; }
+  .import-area p { font-size: 13.5px; color: var(--text-2); }
+  .import-area small { font-size: 12px; color: var(--text-3); }
+
+  /* ── STAT BARS ── */
+  .stat-bar-wrap { margin-top: 6px; }
+  .stat-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+  .stat-bar-label { min-width: 80px; color: var(--text-2); font-weight: 500; }
+  .stat-bar-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .stat-bar-fill { height: 100%; border-radius: 3px; }
+  .stat-bar-count { min-width: 24px; text-align: right; font-weight: 700; color: var(--navy); }
+
   /* config page */
   .config-section { margin-bottom: 28px; }
   .config-section h3 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
@@ -800,6 +974,9 @@
   </div>
   <div class="nav-section">
     <div class="nav-label">Módulos</div>
+    <div class="nav-item" onclick="showTab('inicio')">
+      <span class="icon">🏠</span><span>Início</span>
+    </div>
     <div class="nav-item active" onclick="showTab('ferias')">
       <span class="icon">🌴</span><span>Férias</span>
     </div>
@@ -814,6 +991,9 @@
     </div>
     <div class="nav-item" onclick="showTab('conecta')">
       <span class="icon">⭐</span><span>Feedbacks Conecta</span>
+    </div>
+    <div class="nav-item" onclick="showTab('cards')">
+      <span class="icon">📋</span><span>Cards de Atividades</span>
     </div>
   </div>
   <div class="nav-section">
@@ -970,6 +1150,46 @@
       <div class="conecta-content" id="conectaContent">
         <div class="empty-state"><div class="big">⭐</div><p>Selecione um colaborador ao lado</p></div>
       </div>
+    </div>
+  </div>
+
+  <!-- ═══ INÍCIO / DASHBOARD ═══ -->
+  <div class="tab-page" id="tab-inicio" style="flex:1;flex-direction:column;padding:0">
+    <div class="page-content" id="dashContent" style="flex:1"></div>
+  </div>
+
+  <!-- ═══ CARDS DE ATIVIDADES ═══ -->
+  <div class="tab-page" id="tab-cards" style="flex:1;flex-direction:column;padding:0">
+    <div class="page-content" style="flex:1">
+      <div class="import-area" id="importArea" onclick="triggerImportCards()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDropCards(event)">
+        <div class="big">📂</div>
+        <p>Clique ou arraste o arquivo Excel exportado do Trello</p>
+        <small>Suporta .xlsx — importa cards novos e atualiza os existentes pelo ID</small>
+      </div>
+      <input type="file" id="cardFileInput" accept=".xlsx" style="display:none" onchange="handleFileCards(event)">
+      <div class="cards-toolbar" id="cardsToolbar" style="display:none">
+        <input type="text" id="cardBusca" placeholder="🔍 Buscar por nome..." oninput="renderCards()">
+        <select id="cardFiltroColab" onchange="renderCards()">
+          <option value="">Todos os responsáveis</option>
+        </select>
+        <select id="cardFiltroTipo" onchange="renderCards()">
+          <option value="">Tipo: todos</option>
+          <option value="Meta">⭐ Meta</option>
+          <option value="Atividade">✅ Atividade</option>
+          <option value="">Sem tipo</option>
+        </select>
+        <select id="cardFiltroPrio" onchange="renderCards()">
+          <option value="">Prioridade semana: todas</option>
+          <option value="Sim">🔥 Prioridade da semana</option>
+          <option value="Não">Não prioritárias</option>
+        </select>
+        <select id="cardFiltroLista" onchange="renderCards()">
+          <option value="">Todas as listas</option>
+        </select>
+        <input type="text" id="cardFiltroTag" placeholder="🏷️ Tag..." oninput="renderCards()" style="max-width:130px">
+        <span class="cards-count" id="cardsCount"></span>
+      </div>
+      <div id="cardsGrid" class="cards-grid"></div>
     </div>
   </div>
 
@@ -1315,6 +1535,7 @@ let STATE = {
   homeoffice: [],
   feedbacks: [],
   conecta: [],
+  cards: [],
   scriptUrl: '',
   secretKey: ''
 };
@@ -1416,6 +1637,7 @@ async function syncData() {
     if (data.homeoffice) STATE.homeoffice = data.homeoffice;
     if (data.feedbacks) STATE.feedbacks = data.feedbacks;
     if (data.conecta) STATE.conecta = data.conecta;
+    if (data.cards) STATE.cards = data.cards;
     setSyncStatus('Sincronizado', 'ok');
     renderAll();
     toast('Dados sincronizados!', 'success');
@@ -1471,20 +1693,24 @@ async function deleteRecord(sheet, id) {
 //  NAVEGAÇÃO
 // ═══════════════════════════════════════════════
 const tabTitles = {
+  inicio: '🏠 Início',
   ferias: '🌴 Férias',
   banco: '⏱️ Banco de Horas',
   homeoffice: '🏠 Home Office & Ausências',
   feedbacks: '💬 Feedbacks & PDI',
   conecta: '⭐ Feedbacks Conecta',
+  cards: '📋 Cards de Atividades',
   config: '⚙️ Configurações'
 };
 
 const topActions = {
+  inicio: null,
   ferias: 'openModalFerias',
   banco: 'openModalBH',
   homeoffice: 'openModalHO',
   feedbacks: 'openModalFB',
   conecta: 'openModalConecta',
+  cards: null,
   config: null
 };
 
@@ -1500,7 +1726,7 @@ function showTab(tab) {
   const btn = document.getElementById('btnTopAction');
   if (topActions[tab]) {
     btn.style.display = '';
-    btn.textContent = tab === 'feedbacks' ? '+ Novo Ciclo' : tab === 'conecta' ? '+ Registrar Feedback' :
+    btn.textContent = tab === 'feedbacks' ? '+ Novo Ciclo' : tab === 'conecta' ? '+ Registrar Feedback' : tab === 'cards' ? '⬆️ Importar Excel' :
                       tab === 'banco' ? '+ Atualizar Saldo' : '+ Registrar';
   } else {
     btn.style.display = 'none';
@@ -1508,6 +1734,8 @@ function showTab(tab) {
   renderSidePanel(tab);
   if (tab === 'feedbacks') renderFBTabs();
   if (tab === 'conecta') renderConecta();
+  if (tab === 'inicio') renderDashboard();
+  if (tab === 'cards') renderCards();
 }
 
 function openTopAction() {
@@ -1516,7 +1744,8 @@ function openTopAction() {
     banco: openModalBH,
     homeoffice: openModalHO,
     feedbacks: openModalFB,
-    conecta: openModalConecta
+    conecta: openModalConecta,
+    cards: triggerImportCards
   };
   if (actions[currentTab]) actions[currentTab]();
 }
@@ -1530,6 +1759,8 @@ function renderAll() {
   renderBH();
   renderHO();
   if (currentTab === 'feedbacks') renderFBTabs();
+  if (currentTab === 'cards') renderCards();
+  if (currentTab === 'inicio') renderDashboard();
   renderSidePanel(currentTab);
 }
 
@@ -2217,7 +2448,7 @@ function renderSidePanel(tab) {
   const cw = document.querySelector('.content-wrap');
   if (!cw) return;
 
-  if (['config','feedbacks','conecta'].includes(tab)) {
+  if (['config','feedbacks','conecta','inicio','cards'].includes(tab)) {
     panel.style.display = 'none'; return;
   }
   panel.style.display = '';
@@ -2600,13 +2831,430 @@ async function deleteConecta(id) {
   } catch(e) {}
 }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+//  CARDS — IMPORTAÇÃO EXCEL
+// ═══════════════════════════════════════════════
+function triggerImportCards() {
+  document.getElementById('cardFileInput').click();
+}
+
+function handleDropCards(e) {
+  e.preventDefault();
+  document.getElementById('importArea').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) processCardsFile(file);
+}
+
+function handleFileCards(e) {
+  const file = e.target.files[0];
+  if (file) processCardsFile(file);
+  e.target.value = '';
+}
+
+async function processCardsFile(file) {
+  showLoading(true);
+  try {
+    const data = await file.arrayBuffer();
+    const wb = XLSX.read(data, { type: 'array', cellDates: true });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+    let criados = 0, atualizados = 0;
+
+    rows.forEach(row => {
+      const id = String(row['ID'] || '').trim();
+      if (!id) return;
+
+      // Responsáveis: pode vir como string com vírgula
+      const respRaw = String(row['Responsáveis'] || '').trim();
+      const responsaveis = respRaw ? respRaw.split(',').map(r => r.trim()).filter(Boolean) : [];
+
+      // Etiquetas
+      const etiquetasRaw = String(row['Etiquetas'] || '').trim();
+      const etiquetas = etiquetasRaw ? etiquetasRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+      const card = {
+        id,
+        lista: String(row['Lista'] || '').trim(),
+        titulo: String(row['Título'] || '').trim(),
+        responsaveis,
+        status: String(row['Status'] || '').trim(),
+        dataInicio: fmtDateRaw(row['Data Início']),
+        vencimento: fmtDateRaw(row['Vencimento']),
+        concluido: String(row['Concluído'] || '').trim(),
+        ultimaAtividade: fmtDateRaw(row['Última Atividade']),
+        url: String(row['URL'] || '').trim(),
+        descricao: String(row['Descrição'] || '').trim(),
+        etiquetas,
+        checklists: String(row['Checklists'] || '').trim(),
+        comentarios: String(row['Comentários'] || '').trim(),
+        tipoAtividade: String(row['Tipo Atividade'] || '').trim(),
+        prioridadeSemana: String(row['Prioridade da Semana'] || '').trim(),
+        entregaMeta: String(row['Entrega Meta ICM'] || '').trim(),
+      };
+
+      const idx = STATE.cards.findIndex(c => c.id === id);
+      if (idx >= 0) { STATE.cards[idx] = card; atualizados++; }
+      else { STATE.cards.push(card); criados++; }
+    });
+
+    // Salvar no Sheets se configurado
+    if (STATE.scriptUrl) {
+      await saveRecord('cards', { id: 'batch', cards: JSON.stringify(STATE.cards) });
+    }
+
+    toast(`✅ ${criados} novos · ${atualizados} atualizados`, 'success');
+    renderCards();
+    renderDashboard();
+  } catch(e) {
+    toast('Erro ao ler arquivo: ' + e.message, 'error');
+    console.error(e);
+  } finally {
+    showLoading(false);
+  }
+}
+
+function fmtDateRaw(val) {
+  if (!val) return '';
+  if (val instanceof Date) {
+    return val.toISOString().slice(0, 10);
+  }
+  const s = String(val).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+  return s;
+}
+
+// ═══════════════════════════════════════════════
+//  CARDS — RENDER
+// ═══════════════════════════════════════════════
+function renderCards() {
+  const grid = document.getElementById('cardsGrid');
+  const toolbar = document.getElementById('cardsToolbar');
+  const importArea = document.getElementById('importArea');
+  if (!grid) return;
+
+  if (!STATE.cards.length) {
+    importArea.style.display = '';
+    toolbar.style.display = 'none';
+    grid.innerHTML = '';
+    return;
+  }
+
+  importArea.style.display = 'none';
+  toolbar.style.display = '';
+
+  // Repopular selects únicos
+  const colabSel = document.getElementById('cardFiltroColab');
+  const listaSel = document.getElementById('cardFiltroLista');
+  const allColabs = [...new Set(STATE.cards.flatMap(c => c.responsaveis))].filter(Boolean).sort();
+  const allListas = [...new Set(STATE.cards.map(c => c.lista))].filter(Boolean).sort();
+  const curColab = colabSel.value, curLista = listaSel.value;
+  colabSel.innerHTML = '<option value="">Todos os responsáveis</option>' + allColabs.map(c => `<option value="${c}">${c}</option>`).join('');
+  listaSel.innerHTML = '<option value="">Todas as listas</option>' + allListas.map(l => `<option value="${l}">${l}</option>`).join('');
+  if (curColab) colabSel.value = curColab;
+  if (curLista) listaSel.value = curLista;
+
+  const busca = (document.getElementById('cardBusca')?.value || '').toLowerCase();
+  const filtColab = colabSel.value;
+  const filtTipo = document.getElementById('cardFiltroTipo')?.value || '';
+  const filtPrio = document.getElementById('cardFiltroPrio')?.value || '';
+  const filtLista = listaSel.value;
+  const filtTag = (document.getElementById('cardFiltroTag')?.value || '').toLowerCase();
+
+  // Excluir listas de links/uteis/escopo geral
+  const listasExcluir = ['LINKS UTEIS ICM', 'ATIVIDADES ESCOPO GERAL'];
+
+  let data = STATE.cards.filter(c => !listasExcluir.includes(c.lista));
+  if (busca) data = data.filter(c => c.titulo.toLowerCase().includes(busca));
+  if (filtColab) data = data.filter(c => c.responsaveis.includes(filtColab));
+  if (filtTipo) data = data.filter(c => c.tipoAtividade === filtTipo);
+  if (filtPrio) data = data.filter(c => c.prioridadeSemana === filtPrio);
+  if (filtLista) data = data.filter(c => c.lista === filtLista);
+  if (filtTag) data = data.filter(c => c.etiquetas.some(t => t.toLowerCase().includes(filtTag)));
+
+  // Ordenar: prioridade semana primeiro, depois por lista, depois por vencimento
+  data.sort((a, b) => {
+    if (a.prioridadeSemana === 'Sim' && b.prioridadeSemana !== 'Sim') return -1;
+    if (b.prioridadeSemana === 'Sim' && a.prioridadeSemana !== 'Sim') return 1;
+    if (a.vencimento && b.vencimento) return a.vencimento > b.vencimento ? 1 : -1;
+    if (a.vencimento) return -1;
+    if (b.vencimento) return 1;
+    return 0;
+  });
+
+  document.getElementById('cardsCount').textContent = `${data.length} cards`;
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  if (!data.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="big">📋</div><p>Nenhum card encontrado com esses filtros.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = data.map(c => {
+    const isVencido = c.vencimento && c.vencimento < today && c.concluido !== 'Sim';
+    const listaCls = c.lista.includes('NÃO INICIADAS') ? 'lista-nao-iniciadas'
+                   : c.lista.includes('EM ANDAMENTO') || c.lista.includes('ANDAMENTO') ? 'lista-em-andamento'
+                   : c.lista.includes('CONCLU') ? 'lista-concluidas'
+                   : 'lista-outros';
+    const tipoCls = c.tipoAtividade === 'Meta' ? 'ctb-meta' : c.tipoAtividade === 'Atividade' ? 'ctb-ativ' : 'ctb-sem';
+    const tipoLabel = c.tipoAtividade === 'Meta' ? '⭐ Meta' : c.tipoAtividade === 'Atividade' ? '✅ Atividade' : '';
+
+    const respHtml = c.responsaveis.slice(0, 3).map((r, i) => {
+      const idx = STATE.colaboradores.indexOf(r.split(' ')[0]) >= 0
+        ? STATE.colaboradores.findIndex(col => r.includes(col.split(' ')[0]))
+        : i;
+      return avHtml(r.split(' ')[0], idx, 24);
+    }).join('');
+
+    const tagHtml = c.etiquetas.slice(0, 3).map(t =>
+      `<span class="card-tag">${t}</span>`).join('');
+
+    const dueFmt = c.vencimento ? fmtDate(c.vencimento) : '';
+
+    return `<div class="card-item">
+      <div class="card-item-top">
+        <div style="flex:1">
+          ${tipoLabel ? `<span class="card-type-badge ${tipoCls}">${tipoLabel}</span>` : ''}
+          ${c.prioridadeSemana === 'Sim' ? '<span class="card-type-badge" style="background:#fff3cd;color:#856404;margin-left:4px">🔥 Prioridade</span>' : ''}
+          <div class="card-item-title" style="margin-top:6px">${c.titulo}</div>
+        </div>
+      </div>
+      <div class="card-item-body">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+          ${respHtml}
+          ${c.responsaveis.length ? `<span style="font-size:11px;color:var(--text-3);margin-left:2px">${c.responsaveis.slice(0,2).map(r=>r.split(' ')[0]).join(', ')}${c.responsaveis.length > 2 ? ' +' + (c.responsaveis.length-2) : ''}</span>` : '<span style="font-size:11px;color:var(--text-3)">Sem responsável</span>'}
+        </div>
+        <div class="card-meta-row">
+          ${tagHtml}
+          ${dueFmt ? `<span class="card-due ${isVencido ? 'vencido' : ''}">📅 ${dueFmt}${isVencido ? ' ⚠️' : ''}</span>` : ''}
+        </div>
+      </div>
+      <div class="card-item-footer">
+        <span class="card-lista-chip ${listaCls}">${c.lista}</span>
+        ${c.url ? `<a href="${c.url}" target="_blank" style="font-size:11px;color:var(--teal);text-decoration:none">↗ Trello</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════
+function renderDashboard() {
+  const el = document.getElementById('dashContent');
+  if (!el) return;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const now = new Date();
+
+  // ── Cards stats ──
+  const cardsAtivos = STATE.cards.filter(c =>
+    !['LINKS UTEIS ICM','ATIVIDADES ESCOPO GERAL'].includes(c.lista));
+  const cardsPrio = cardsAtivos.filter(c => c.prioridadeSemana === 'Sim');
+  const cardsAndamento = cardsAtivos.filter(c => c.lista.includes('ANDAMENTO'));
+  const cardsConcluidos = cardsAtivos.filter(c => c.lista.includes('CONCLU'));
+  const cardsNaoIniciados = cardsAtivos.filter(c => c.lista.includes('NÃO INICIADAS') || c.lista.includes('NAO INICIADAS'));
+  const cardsMetas = cardsAtivos.filter(c => c.tipoAtividade === 'Meta');
+  const cardsMetasConcluidas = cardsMetas.filter(c => c.lista.includes('CONCLU'));
+  const cardsVencidos = cardsAtivos.filter(c => c.vencimento && c.vencimento < today && !c.lista.includes('CONCLU'));
+
+  // ── Férias ──
+  const feriasProximas = STATE.ferias.filter(f => f.retorno >= today).sort((a,b)=>a.inicio>b.inicio?1:-1);
+  const feriasMes = STATE.ferias.filter(f => f.inicio?.slice(0,7) === today.slice(0,7) || f.retorno?.slice(0,7) === today.slice(0,7));
+
+  // ── Banco de horas ──
+  const bhPorColab = {};
+  STATE.bancoHoras.forEach(b => { if (!bhPorColab[b.colab] || b.dataVerif > bhPorColab[b.colab].dataVerif) bhPorColab[b.colab] = b; });
+  const bhNegativos = Object.values(bhPorColab).filter(b => b.saldo < 0);
+
+  // ── HO / Ausências hoje ──
+  const hoHoje = STATE.homeoffice.filter(h => h.data === today);
+
+  // ── Feedbacks: último por colaborador ──
+  const ultimoFb = {};
+  STATE.feedbacks.forEach(f => { if (!ultimoFb[f.colab] || f.data > ultimoFb[f.colab]) ultimoFb[f.colab] = f.data; });
+
+  // ── Por colaborador: cards ──
+  const cardsPorColab = {};
+  STATE.colaboradores.forEach(c => { cardsPorColab[c] = { ativ: 0, meta: 0, prio: 0 }; });
+  cardsAtivos.forEach(card => {
+    card.responsaveis.forEach(r => {
+      const match = STATE.colaboradores.find(c => r.includes(c.split(' ')[0]) || c.includes(r.split(' ')[0]));
+      if (match) {
+        if (!cardsPorColab[match]) cardsPorColab[match] = { ativ: 0, meta: 0, prio: 0 };
+        if (!card.lista.includes('CONCLU')) cardsPorColab[match].ativ++;
+        if (card.tipoAtividade === 'Meta' && !card.lista.includes('CONCLU')) cardsPorColab[match].meta++;
+        if (card.prioridadeSemana === 'Sim') cardsPorColab[match].prio++;
+      }
+    });
+  });
+
+  el.innerHTML = `
+    <!-- KPIs principais -->
+    <div class="dash-grid">
+      <div class="dash-kpi teal">
+        <div class="kpi-icon">📋</div>
+        <div class="kpi-label">Cards ativos</div>
+        <div class="kpi-value">${cardsAndamento.length + cardsNaoIniciados.length}</div>
+        <div class="kpi-sub">${cardsNaoIniciados.length} não iniciados · ${cardsAndamento.length} em andamento</div>
+      </div>
+      <div class="dash-kpi gold">
+        <div class="kpi-icon">🔥</div>
+        <div class="kpi-label">Prioridade semana</div>
+        <div class="kpi-value">${cardsPrio.length}</div>
+        <div class="kpi-sub">cards prioritários agora</div>
+      </div>
+      <div class="dash-kpi green">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-label">Concluídos</div>
+        <div class="kpi-value">${cardsConcluidos.length}</div>
+        <div class="kpi-sub">de ${cardsAtivos.length} cards total</div>
+      </div>
+      <div class="dash-kpi red">
+        <div class="kpi-icon">⚠️</div>
+        <div class="kpi-label">Vencidos</div>
+        <div class="kpi-value">${cardsVencidos.length}</div>
+        <div class="kpi-sub">cards com prazo vencido</div>
+      </div>
+      <div class="dash-kpi purple">
+        <div class="kpi-icon">⭐</div>
+        <div class="kpi-label">Metas</div>
+        <div class="kpi-value">${cardsMetas.length}</div>
+        <div class="kpi-sub">${cardsMetasConcluidas.length} concluídas · ${cardsMetas.length - cardsMetasConcluidas.length} em aberto</div>
+      </div>
+      <div class="dash-kpi navy">
+        <div class="kpi-icon">🌴</div>
+        <div class="kpi-label">Férias este mês</div>
+        <div class="kpi-value">${feriasMes.length}</div>
+        <div class="kpi-sub">${feriasProximas.length} próximas no calendário</div>
+      </div>
+    </div>
+
+    <div class="dash-row">
+      <!-- Cards: prioridade da semana -->
+      <div class="dash-section">
+        <div class="dash-section-title"><span>🔥</span> Prioridade da semana</div>
+        <div class="dash-card">
+          <div class="dash-card-body">
+            ${cardsPrio.length === 0
+              ? '<div class="no-data">Nenhum card prioritário</div>'
+              : cardsPrio.slice(0, 8).map(c => `
+              <div class="dash-list-item">
+                <div style="font-size:11px">${c.tipoAtividade === 'Meta' ? '⭐' : '✅'}</div>
+                <div class="dash-item-name">
+                  <span class="truncate">${c.titulo}</span>
+                  <div class="dash-item-sub">${c.responsaveis.map(r=>r.split(' ')[0]).join(', ') || '—'}</div>
+                </div>
+                <div class="dash-item-right">
+                  <span class="chip ${c.lista.includes('ANDAMENTO') ? 'chip-teal' : 'chip-grey'}" style="font-size:10px">${c.lista.includes('ANDAMENTO') ? 'Em andamento' : 'Não iniciado'}</span>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Por colaborador -->
+      <div class="dash-section">
+        <div class="dash-section-title"><span>👥</span> Carga por colaborador</div>
+        <div class="dash-card">
+          <div class="dash-card-body">
+            ${STATE.colaboradores.map((c,i) => {
+              const stats = cardsPorColab[c] || { ativ: 0, meta: 0, prio: 0 };
+              const lastFb = ultimoFb[c];
+              return `<div class="dash-list-item">
+                ${avHtml(c, i, 28)}
+                <div class="dash-item-name">
+                  <span>${c}</span>
+                  <div class="dash-item-sub">Último feedback: ${lastFb ? fmtDate(lastFb) : '—'}</div>
+                </div>
+                <div class="dash-item-right" style="font-size:11px;color:var(--text-2)">
+                  <div>${stats.ativ} atividades</div>
+                  <div>${stats.meta} metas · ${stats.prio} prio</div>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-row">
+      <!-- Vencidos -->
+      <div class="dash-section">
+        <div class="dash-section-title"><span>⚠️</span> Cards com prazo vencido</div>
+        <div class="dash-card">
+          <div class="dash-card-body">
+            ${cardsVencidos.length === 0
+              ? '<div class="no-data">Nenhum card vencido 🎉</div>'
+              : cardsVencidos.slice(0, 6).map(c => `
+              <div class="dash-list-item">
+                <div class="dash-item-name">
+                  <span class="truncate">${c.titulo}</span>
+                  <div class="dash-item-sub">${c.responsaveis.map(r=>r.split(' ')[0]).join(', ') || '—'}</div>
+                </div>
+                <div class="dash-item-right" style="color:var(--red);font-size:11px;font-weight:600">
+                  ${fmtDate(c.vencimento)}
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Situação do time hoje -->
+      <div class="dash-section">
+        <div class="dash-section-title"><span>📍</span> Time hoje — ${fmtDate(today)}</div>
+        <div class="dash-card">
+          <div class="dash-card-body">
+            ${hoHoje.length === 0
+              ? '<div class="no-data" style="padding:16px">Todos presencialmente</div>'
+              : hoHoje.map(h => `
+              <div class="dash-list-item">
+                ${avHtml(h.colab, STATE.colaboradores.indexOf(h.colab), 28)}
+                <div class="dash-item-name">
+                  <span>${h.colab}</span>
+                  <div class="dash-item-sub">${h.tipo} · ${h.periodo}</div>
+                </div>
+                <span class="chip ${h.tipo === 'Home Office' ? 'chip-teal' : 'chip-gold'}" style="font-size:10px">${h.tipo === 'Home Office' ? '🏠 HO' : '⚠️ Ausência'}</span>
+              </div>`).join('')}
+            ${bhNegativos.length > 0 ? `
+              <div style="padding:10px 16px;border-top:1px solid var(--border)">
+                <div style="font-size:11px;font-weight:700;color:var(--red);margin-bottom:6px">⏱️ Saldo negativo</div>
+                ${bhNegativos.map(b => `<div style="font-size:12px;color:var(--text-2);margin-bottom:2px">${b.colab}: <b style="color:var(--red)">${b.saldoDisplay || b.saldo+'h'}</b></div>`).join('')}
+              </div>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Próximas férias -->
+    ${feriasProximas.length > 0 ? `
+    <div class="dash-section">
+      <div class="dash-section-title"><span>🌴</span> Próximas férias</div>
+      <div class="dash-card">
+        <div class="dash-card-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+          ${feriasProximas.slice(0,6).map(f => `
+          <div class="dash-list-item" style="border-right:1px solid var(--border)">
+            ${avHtml(f.colab, STATE.colaboradores.indexOf(f.colab), 28)}
+            <div class="dash-item-name">
+              <span>${f.colab}</span>
+              <div class="dash-item-sub">${fmtDate(f.inicio)} → ${fmtDate(f.retorno)}</div>
+              <div class="dash-item-sub"><b>${f.dias} dias</b></div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>` : ''}
+  `;
+}
+
+// ═══════════════════════════════════════════════
 //  INIT
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 loadConfig();
 repopulateSelects();
 renderAll();
-showTab('ferias');
+showTab('inicio');
 
 // auto-sync if configured
 if (STATE.scriptUrl) {
