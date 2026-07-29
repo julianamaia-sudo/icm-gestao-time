@@ -1288,6 +1288,18 @@
           </div>
         </div>
 
+        <!-- Vencimento multiselect -->
+        <div class="ms-wrap" id="msVenc">
+          <button class="ms-btn" onclick="toggleMs('msVenc')" type="button">
+            <span class="ms-label" id="msVencLabel">Vencimento</span>
+            <span class="ms-arrow">▼</span>
+          </button>
+          <div class="ms-dropdown">
+            <div id="msVencOptions"></div>
+            <div class="ms-clear" onclick="clearMs('msVenc')">Limpar seleção</div>
+          </div>
+        </div>
+
         <span class="cards-count" id="cardsCount"></span>
       </div>
       <div id="cardsGrid" class="cards-grid"></div>
@@ -3049,7 +3061,7 @@ async function processCardsFile(file) {
     // Salvar contagem no localStorage para referência
     localStorage.setItem('icm_cards_cache', JSON.stringify(STATE.cards));
     // Resetar opções dos multiselects para repopular com novos dados
-    ['msColab','msTipo','msPrio','msLista','msTag'].forEach(id => {
+    ['msColab','msTipo','msPrio','msLista','msTag','msVenc'].forEach(id => {
       const el = document.getElementById(id + 'Options');
       if (el) el.innerHTML = '';
     });
@@ -3135,7 +3147,7 @@ function updateMsLabel(id) {
   const sel = getMsSelected(id);
   const labelEl = document.getElementById(id + 'Label');
   if (!labelEl) return;
-  const defaults = { msColab: 'Responsáveis', msTipo: 'Tipo', msPrio: 'Prioridade semana', msLista: 'Listas', msTag: 'Tags' };
+  const defaults = { msColab: 'Responsáveis', msTipo: 'Tipo', msPrio: 'Prioridade semana', msLista: 'Listas', msTag: 'Tags', msVenc: 'Vencimento' };
   if (sel.size === 0) {
     labelEl.innerHTML = defaults[id] || id;
   } else {
@@ -3185,6 +3197,7 @@ function renderCards() {
     populateMsOptions('msPrio',  allPrios.length ? allPrios : ['Sim','Não']);
     populateMsOptions('msLista', allListas);
     populateMsOptions('msTag',   allTags);
+    populateMsOptions('msVenc',  ['Vencido', 'Vence hoje', 'Vence esta semana', 'Vence este mês', 'Sem vencimento']);
   }
 
   // Filtros ativos
@@ -3202,6 +3215,24 @@ function renderCards() {
   if (selPrio.size)   data = data.filter(c => selPrio.has(c.prioridadeSemana));
   if (selLista.size)  data = data.filter(c => selLista.has(c.lista));
   if (selTag.size)    data = data.filter(c => c.etiquetas.some(t => selTag.has(t)));
+
+  // Filtro de vencimento
+  const selVenc = getMsSelected('msVenc');
+  if (selVenc.size) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const endWeek = new Date(today); endWeek.setDate(today.getDate() + (7 - today.getDay()));
+    const endMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    data = data.filter(c => {
+      if (!c.vencimento && selVenc.has('Sem vencimento')) return true;
+      if (!c.vencimento) return false;
+      const d = new Date(c.vencimento + 'T12:00');
+      if (selVenc.has('Vencido') && d < today) return true;
+      if (selVenc.has('Vence hoje') && d.toDateString() === today.toDateString()) return true;
+      if (selVenc.has('Vence esta semana') && d >= today && d <= endWeek) return true;
+      if (selVenc.has('Vence este mês') && d >= today && d <= endMonth) return true;
+      return false;
+    });
+  }
 
   // Ordenar: prioridade semana primeiro, depois por lista, depois por vencimento
   data.sort((a, b) => {
