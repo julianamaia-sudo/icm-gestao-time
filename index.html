@@ -900,11 +900,11 @@
   }
   .ms-btn {
     display: flex; align-items: center; gap: 6px;
-    padding: 6px 10px; height: 34px;
+    padding: 5px 10px; height: 32px;
     border: 1px solid var(--border); border-radius: var(--radius-sm);
-    background: var(--bg); font-family: inherit; font-size: 12.5px;
+    background: var(--bg); font-family: inherit; font-size: 12px;
     color: var(--text); cursor: pointer; white-space: nowrap;
-    min-width: 160px; justify-content: space-between;
+    min-width: 130px; max-width: 200px; justify-content: space-between;
     transition: border .15s;
   }
   .ms-btn:focus, .ms-btn.open { border-color: var(--teal); outline: none; background: #fff; }
@@ -915,7 +915,7 @@
     position: absolute; top: calc(100% + 4px); left: 0; z-index: 200;
     background: #fff; border: 1px solid var(--border);
     border-radius: var(--radius-sm); box-shadow: var(--shadow-lg);
-    min-width: 220px; max-height: 260px; overflow-y: auto;
+    min-width: 200px; max-height: 280px; overflow-y: auto; overflow-x: hidden;
   }
   .ms-wrap.open .ms-dropdown { display: block; }
   .ms-search {
@@ -929,13 +929,13 @@
   }
   .ms-option {
     display: flex; align-items: center; gap: 8px;
-    padding: 7px 12px; font-size: 12.5px; cursor: pointer;
+    padding: 6px 12px; font-size: 12.5px; cursor: pointer;
     color: var(--text); transition: background .1s;
-    user-select: none;
+    user-select: none; white-space: nowrap;
   }
   .ms-option:hover { background: var(--teal-light); }
-  .ms-option input[type=checkbox] { accent-color: var(--teal); width: 14px; height: 14px; flex-shrink: 0; }
-  .ms-option.checked { font-weight: 600; }
+  .ms-option input[type=checkbox] { accent-color: var(--teal); width: 13px; height: 13px; flex-shrink: 0; cursor: pointer; }
+  .ms-option.checked { font-weight: 600; color: var(--navy); }
   .ms-clear {
     padding: 6px 12px; font-size: 11.5px; color: var(--teal);
     cursor: pointer; border-top: 1px solid var(--border);
