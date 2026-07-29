@@ -2856,8 +2856,20 @@ async function processCardsFile(file) {
   try {
     const data = await file.arrayBuffer();
     const wb = XLSX.read(data, { type: 'array', cellDates: true });
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+    // Tenta achar a aba "Cards", senão pega a primeira
+    const sheetName = wb.SheetNames.find(n => n.toLowerCase().includes('card')) || wb.SheetNames[0];
+    const ws = wb.Sheets[sheetName];
+
+    if (!ws) throw new Error('Nenhuma aba encontrada no arquivo. Abas disponíveis: ' + wb.SheetNames.join(', '));
+
+    const rows = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
+
+    if (!rows || rows.length === 0) throw new Error('Arquivo sem dados ou formato inesperado. Verifique se é o arquivo exportado pelo app do Trello.');
+
+    // Detecta automaticamente as colunas disponíveis (para debug)
+    const colunasDisponiveis = rows.length > 0 ? Object.keys(rows[0]) : [];
+    console.log('Colunas detectadas:', colunasDisponiveis);
 
     let criados = 0, atualizados = 0;
 
